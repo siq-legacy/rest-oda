@@ -1,8 +1,5 @@
 package oda.datatools.connectivity.rest.impl;
 
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.datatools.connectivity.oda.OdaException;
 
 public interface SearchRequest {

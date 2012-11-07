@@ -1,6 +1,5 @@
 package oda.datatools.connectivity.rest.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,15 +12,15 @@ public class RESTList
 	this.columnlist = columnlist;
 }
 
-  private List<Class> datatype;
-  public void setDatatype(List<Class> datatype) {
+  private List<Class<?>> datatype;
+  public void setDatatype(List<Class<?>> datatype) {
 	this.datatype = datatype;
 }
 
 private List<Object> row;
   private List<List<Object>> rowlist;
 
-  public List<Class> getDatatype()
+  public List<Class<?>> getDatatype()
   {
     return this.datatype;
   }
@@ -38,7 +37,7 @@ private List<Object> row;
     
   }
 
-  public void addDatatype(Class clas) {
+  public void addDatatype(Class<?> clas) {
     this.datatype.add(clas);
   }
 

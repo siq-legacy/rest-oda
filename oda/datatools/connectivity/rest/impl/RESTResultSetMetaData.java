@@ -50,8 +50,8 @@ public class RESTResultSetMetaData
 
   public int getdatatype(int index)
   {
-    List siqdatatype = this.siqlist.getDatatype();
-    Class cls = (Class)siqdatatype.get(index);
+    List<Class<?>> siqdatatype = this.siqlist.getDatatype();
+    Class<?> cls = (Class<?>)siqdatatype.get(index);
  
     if (cls.getName() == "java.lang.String")
     {

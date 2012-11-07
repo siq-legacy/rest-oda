@@ -11,7 +11,7 @@ import org.eclipse.datatools.connectivity.oda.util.manifest.ManifestExplorer;
 public class RESTDriver
   implements IDriver
 {
-  static String ODA_DATA_SOURCE_ID = "oda.datatools.connectivity.rest.siq";
+  static String ODA_DATA_SOURCE_ID = "oda.datatools.connectivity.rest";
 
   public IConnection getConnection(String arg0) throws OdaException
   {

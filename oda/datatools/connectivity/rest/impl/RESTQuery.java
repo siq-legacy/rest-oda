@@ -39,17 +39,17 @@ public class RESTQuery
   {
   }
   
-
-  private void testsiq(String methodName) throws OdaException
+//this is for testing purpose
+ /* private void testsiq(String methodName) throws OdaException
   {
     if ((this.Restlist == null) || (this.Restlist.getRows() == null) || (this.Restlist.getRows().size() == 0))
       throw new OdaException("Data Feed is null or empty in " + methodName);
   }
-
+*/
   public void clearInParameters() throws OdaException
   {
     this.logger.finest("ClearInParameters");
-    System.out.println("clearInParameters"+this.Param.size());
+   
   }
   
   public void close()
@@ -114,7 +114,7 @@ public class RESTQuery
 
   public QuerySpecification getSpecification()
   {
-	  System.out.println("QuerySpecification"+this.Param.size());
+	
     return null;
   }
   public void prepare(String queryText)
@@ -221,7 +221,7 @@ public class RESTQuery
   public void setProperty(String name, String value)
     throws OdaException
   {
-	  System.out.println("the property"+name+""+value);
+	
     this.logger.finest("Property " + name + " : " + value);
   }
 

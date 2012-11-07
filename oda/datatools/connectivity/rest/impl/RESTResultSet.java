@@ -258,8 +258,6 @@ public class RESTResultSet
 	    {
 	      this.m_currentRowId += 1;
 	      this.curRow = ((List<Object>)this.rowIter.next());
-	     
-	      System.out.println("the row id"+this.m_currentRowId);
 	      return true;
 	     
 	    }
