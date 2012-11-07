@@ -151,6 +151,7 @@ public class RESTClient {
             httpResponse = client.execute(request);
             responseCode = httpResponse.getStatusLine().getStatusCode();
             message = httpResponse.getStatusLine().getReasonPhrase();
+            System.out.println("the Reason code is"+responseCode);
             HttpEntity entity = httpResponse.getEntity();
             
             
