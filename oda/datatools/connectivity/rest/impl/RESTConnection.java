@@ -71,7 +71,7 @@ public class RESTConnection
 
 @Override
 public IQuery newQuery(String dataSetType) throws OdaException {
-	// TODO Auto-generated method stub
+
 	 IQuery aQuery = (IQuery)this.queryMap.get(dataSetType);
 	    if (aQuery != null) {
 	      return aQuery;

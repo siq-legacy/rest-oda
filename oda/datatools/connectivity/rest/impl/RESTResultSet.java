@@ -29,12 +29,11 @@ public class RESTResultSet
   private SearchRequest searchrequest;
     
   
-  public RESTResultSet(SearchRequest searchRequest,RESTResultSetMetaData resultSetMetaData,Map<String,Object> Param) throws OdaException
+  public RESTResultSet(SearchRequest searchRequest,RESTResultSetMetaData resultSetMetaData) throws OdaException
   {
     this.resultSetMetaData = resultSetMetaData;
     this.searchrequest=searchRequest;
-    this.searchrequest.setlimit(500);
-    this.searchrequest.setOffset(0);
+   
     
     setQuery();
   }
@@ -248,9 +247,7 @@ public class RESTResultSet
 	    this.rows = this.searchrequest.executeQuery().getRows();
 	    this.rowIter = this.rows.listIterator();
 	    this.setMaxRows(this.rows.size());
-	    int offset=this.searchrequest.getOffset();
-	    int limit=this.searchrequest.getlimit();
-	    this.searchrequest.setOffset(offset+limit);
+	 
   }
   public boolean check()
   {

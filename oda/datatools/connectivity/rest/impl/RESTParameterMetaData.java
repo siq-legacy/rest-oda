@@ -1,5 +1,7 @@
 package oda.datatools.connectivity.rest.impl;
 
+import java.util.Map;
+
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 
@@ -7,27 +9,31 @@ public class RESTParameterMetaData
   implements IParameterMetaData
 {
   private int parametercount = 0;
-  public RESTParameterMetaData() {
+  private   Map<Integer,Object> Param;
+  public RESTParameterMetaData( Map<Integer,Object> Param) {
+	  this.Param=Param;
+	  this.parametercount=Param.size();
    }
 
   public int getParameterCount() throws OdaException
   {
+	  System.out.println("getParameterCount Name"+this.parametercount);
     return this.parametercount;
   }
 
-  public void setParametercount(int parametercount) {
-	this.parametercount = parametercount;
-}
+ 
 
 public int getParameterMode(int param)
     throws OdaException
   {
+	
     return 1;
   }
 
   public String getParameterName(int param)
     throws OdaException
   {
+	 
     int nativeTypeCode = getParameterType(param);
     return RESTDriver.getNativeDataTypeName(nativeTypeCode);
   }
@@ -35,12 +41,13 @@ public int getParameterMode(int param)
   public int getParameterType(int param)
     throws OdaException
   {
+	 
     return 11;
   }
 
   public String getParameterTypeName(int param) throws OdaException
   {
-   
+	
       return "JavaObject";
   }
 

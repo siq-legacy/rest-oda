@@ -1,10 +1,12 @@
 package oda.datatools.connectivity.rest.impl;
 
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -21,18 +23,22 @@ import siqcolumns.Siqcolumns;
 public class RESTQuery
   implements IQuery
 {
-  private int m_maxRows;
+ 
+private int m_maxRows;
   private String queryText;
   protected Logger logger = Logger.getLogger(RESTQuery.class.getName());
   private RESTList Restlist;
   private RESTResultSetMetaData resultsetmetadata;
   private RESTParameterMetaData parametermetadata;
-  private Map<String,Object> Param;
+  private Map<Integer, Object> Param_pos;
+  private Map<String,Object>  Param_name;
+ 
   private SearchRequest searchRequest;
  
   public RESTQuery()
   {
-	  Param=new  HashMap<String,Object>();
+	  Param_pos=new  HashMap<Integer,Object>();
+	  Param_name=new  HashMap<String,Object>();
   }
   public void cancel()
     throws OdaException, UnsupportedOperationException
@@ -62,11 +68,10 @@ public class RESTQuery
     throws OdaException
   {
     this.logger.finest("EXECUTE QUERY");
-	parametermetadata=new RESTParameterMetaData();
-    parametermetadata.setParametercount(Param.size());
+	parametermetadata=new RESTParameterMetaData(this.Param_pos);
     searchRequest.setQueryText(this.queryText);
     searchRequest.setRESTlist(Restlist);
-    IResultSet  resultSet= new RESTResultSet(searchRequest,this.resultsetmetadata,this.Param);
+    IResultSet  resultSet= new RESTResultSet(searchRequest,this.resultsetmetadata);
     resultSet.setMaxRows(getMaxRows());
     
     return resultSet;
@@ -117,17 +122,40 @@ public class RESTQuery
 	
     return null;
   }
-  public void prepare(String queryText)
+  @SuppressWarnings("unchecked")
+public void prepare(String queryText)
     throws OdaException
   {
 	 this.queryText=queryText;
-	 Siqcolumns columns=new Siqcolumns();
-	 columns.nodeColumns();
+	 int last_track=queryText.lastIndexOf('/');
+	 CharSequence sequence=queryText.subSequence(last_track+1, queryText.length());
+	 List<Class<?>> types;
+	 List<String> names;
+	 try
+	 {
+		 Class<?> cls = Class.forName("siqcolumns.Siqcolumns");
+		 Object obj = cls.newInstance();
+		 Class<?> noparams[] = {};
+		 Method columnstype = cls.getDeclaredMethod(sequence.toString()+"Columns", noparams);
+		 columnstype.invoke(obj, null);
+		 Method columns_names = cls.getDeclaredMethod("getColumns", noparams);
+		
+		names=(List<String>) columns_names.invoke(obj, null);
+		 Method columns_types = cls.getDeclaredMethod("getDatatype", noparams);
+		
+		types=(List<Class<?>>) columns_types.invoke(obj, null);
+	 }
+	 catch(Exception ex)
+	 {
+		 ex.printStackTrace();
+		 throw new OdaException("Exception in the prepare Query");
+		 
+	 }
+	 
 	 this.Restlist = new RESTList();
-	 this.Restlist.setColumnlist(columns.getColumns());
-	 this.Restlist.setDatatype(columns.getDatatype());
-	 resultsetmetadata=new RESTResultSetMetaData();
-	 resultsetmetadata.setColumntag(this.Restlist);
+	 this.Restlist.setColumnlist(names);
+	 this.Restlist.setDatatype(types);
+	 resultsetmetadata=new RESTResultSetMetaData(this.Restlist);
   }
 
   public void setAppContext(Object context)
@@ -139,53 +167,62 @@ public class RESTQuery
   public void setBigDecimal(String arg0, BigDecimal arg1)
     throws OdaException
   {
+	  this.Param_name.put(arg0, arg1);
   }
 
   public void setBigDecimal(int arg0, BigDecimal arg1)
     throws OdaException
   {
+	  this.Param_pos.put(arg0, arg1);
   }
 
   public void setBoolean(String arg0, boolean arg1)
     throws OdaException
   {
+	  this.Param_name.put(arg0, arg1);
   }
 
   public void setBoolean(int arg0, boolean arg1)
     throws OdaException
   {
+	  this.Param_pos.put(arg0, arg1);
   }
 
   public void setDate(String arg0, Date arg1)
     throws OdaException
   {
+	  this.Param_name.put(arg0, arg1);
   }
 
   public void setDate(int arg0, Date arg1)
     throws OdaException
   {
+	  this.Param_pos.put(arg0, arg1);
   }
 
   public void setDouble(String arg0, double arg1)
     throws OdaException
   {
+	  this.Param_name.put(arg0, arg1);
   }
 
   public void setDouble(int arg0, double arg1)
     throws OdaException
   {
+	  this.Param_pos.put(arg0, arg1);
   }
 
   public void setInt(String arg0, int arg1)
     throws OdaException
   {
+	  this.Param_name.put(arg0, arg1);
 	
   }
 
   public void setInt(int arg0, int arg1)
     throws OdaException
   {
-	  
+	  this.Param_pos.put(arg0, arg1);
   }
 
   public void setMaxRows(int max)
@@ -208,13 +245,16 @@ public class RESTQuery
   public void setObject(String arg0, Object arg1)
     throws OdaException
   {
-	  this.Param.put(arg0, arg1);
+	  this.Param_name.put(arg0, arg1);
 	  searchRequest=(SearchRequest) arg1;
+	 
   }
 
   public void setObject(int arg0, Object arg1)
     throws OdaException
   {
+	  this.Param_pos.put(arg0, arg1);
+	  searchRequest=(SearchRequest) arg1;
 	  
   }
 
@@ -241,34 +281,38 @@ public class RESTQuery
     throws OdaException
   {
 	
-	 
+	  this.Param_name.put(arg0, arg1);
 	  
   }
 
   public void setString(int arg0, String arg1)
     throws OdaException
   {
-	
+	  this.Param_pos.put(arg0, arg1);
 	
   }
 
   public void setTime(String arg0, Time arg1)
     throws OdaException
   {
+	  this.Param_name.put(arg0, arg1);
   }
 
   public void setTime(int arg0, Time arg1)
     throws OdaException
   {
+	  this.Param_pos.put(arg0, arg1);
   }
 
   public void setTimestamp(String arg0, Timestamp arg1)
     throws OdaException
   {
+	  this.Param_name.put(arg0, arg1);
   }
 
   public void setTimestamp(int arg0, Timestamp arg1)
     throws OdaException
   {
+	  this.Param_pos.put(arg0, arg1);
   }
 }

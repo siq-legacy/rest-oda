@@ -1,12 +1,11 @@
 package oda.datatools.connectivity.rest.impl;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
-
+import org.eclipse.datatools.connectivity.oda.util.manifest.DataSetType;
+import org.eclipse.datatools.connectivity.oda.util.manifest.DataTypeMapping;
 public class RESTResultSetMetaData
   implements IResultSetMetaData
 {
@@ -14,15 +13,11 @@ public class RESTResultSetMetaData
   protected static Logger logger = Logger.getLogger(RESTResultSetMetaData.class.getName());
   private RESTList siqlist;
 
-  public void setColumntag(RESTList siqlistentries)
+  public RESTResultSetMetaData(RESTList siqlistentries)
   {
 	  this.siqlist = siqlistentries;
 	    for (String tag : siqlistentries.getColumnlist())
 	      this.colHeaders.add(tag);
-  }
-  public RESTResultSetMetaData()
-  {
-    
   }
 
   public int getColumnCount() throws OdaException
@@ -48,56 +43,40 @@ public class RESTResultSetMetaData
     return (String)this.colHeaders.get(index - 1);
   }
 
-  public int getdatatype(int index)
+  public String getdatatype(int index)
   {
     List<Class<?>> siqdatatype = this.siqlist.getDatatype();
-    Class<?> cls = (Class<?>)siqdatatype.get(index);
+    Class<?> cls = (Class<?>)siqdatatype.get(index-1);
  
-    if (cls.getName() == "java.lang.String")
-    {
-      return 1;
-    }
-    if (cls.getName() == "java.lang.Boolean")
-    {
-      return 16;
-    }
-    if (cls.getName() == "java.lang.Integer")
-    {
-      return 4;
-    }
-    if (cls.getName() == "java.lang.BigInteger")
-    {
-      return -5;
-    }
-    if (cls.getName() == "java.text.SimpleDateFormat")
-    {
-      return -6;
-    }
-    if (cls.getName() == "java.util.Date")
-    {
-      return 91;
-    }
-    if (cls.getName() == "java.lang.Double")
-    {
-      return 8;
-    }
-
+    return cls.getName();
    
-    return 1;
   }
-
   public int getColumnType(int index)
     throws OdaException
   {
-    
-    return getdatatype(index-1);
+	  DataSetType typeMapping[] = RESTDriver.getManifest().getDataSetTypes();
+		for(int i=0;i<typeMapping.length;i++)
+		{
+			DataTypeMapping typemap[]=typeMapping[i].getDataTypeMappings();
+			for(int j=0;j<typemap.length;j++)
+			{
+				if(getdatatype(index).equals(typemap[j].getNativeType()))
+				{
+					return typemap[j].getNativeTypeCode();
+				}
+				
+			}
+		
+		}
+		return 1;
+   
   }
 
   public String getColumnTypeName(int index)
     throws OdaException
   {
-    int nativeTypeCode = getColumnType(index);
-    return RESTDriver.getNativeDataTypeName(nativeTypeCode);
+	return getdatatype(index);
+
   }
 
   public int getPrecision(int arg0)

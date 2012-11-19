@@ -84,7 +84,7 @@ public class RESTDataSetMetaData
   public boolean supportsNamedParameters()
     throws OdaException
   {
-    return true;
+    return false;
   }
 
   public boolean supportsNamedResultSets()

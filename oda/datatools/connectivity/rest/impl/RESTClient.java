@@ -4,18 +4,23 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import net.sf.json.JSONObject;
+
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.eclipse.datatools.connectivity.oda.OdaException;
@@ -74,6 +79,27 @@ public class RESTClient {
     {
     	jsonobjlist = jo;
     }
+    public void httpGet(String urlStr) throws IOException {
+		  URL url = new URL(urlStr);
+		  System.out.println(url.toString());
+		  HttpURLConnection conn =
+		      (HttpURLConnection) url.openConnection();
+		  responseCode=conn.getResponseCode();
+		  if (conn.getResponseCode() != 200) {
+		    throw new IOException(conn.getResponseMessage());
+		  }
+		  BufferedReader rd = new BufferedReader(
+		      new InputStreamReader(conn.getInputStream()));
+		  StringBuilder sb = new StringBuilder();
+		  String line;
+		  while ((line = rd.readLine()) != null) {
+		    sb.append(line);
+		  }
+		  response=sb.toString();
+		  
+		  rd.close();
+		  conn.disconnect();
+		}
     public void  Execute(RequestMethod method) throws Exception
     {
     	 switch(method) 
@@ -83,31 +109,28 @@ public class RESTClient {
                 String combinedParams = "";
                 if(!params.isEmpty()){
                     combinedParams += "?";
+                    
                     for(NameValuePair p : params)
                     {
                         String paramString = p.getName() + "=" + p.getValue();
                         if(combinedParams.length() > 1)
                         {
-                            combinedParams  +=  "&&" + paramString;
+                        	combinedParams  +=  "&&" + paramString;
                         }
                         else
                         {
-                            combinedParams += paramString;
+                        	combinedParams += paramString;
                         }
                     }
+                  
+                 
                 }
-                HttpGet request = new HttpGet(url + combinedParams);
-                for(NameValuePair h : headers)
-                {
-                    request.addHeader(h.getName(), h.getValue());
-                }
-                httpResponse=executeRequest(request);
-                while(httpResponse!=null &&httpResponse.getStatusLine().getStatusCode()==206)
-                {
-                	Thread.sleep(5);
-                	httpResponse=executeRequest(request);
-                }
-                break;
+      
+               String s=combinedParams.toString();
+      	
+      		   System.out.println(url+s);
+               httpGet(url+s);
+               break;
             }
             case POST:
             {
@@ -141,13 +164,14 @@ public class RESTClient {
        
        
     }
-
+    
     private HttpResponse executeRequest(HttpUriRequest request) throws OdaException
     {
-        org.apache.http.client.HttpClient client = RESTHttpClientFactory.getThreadSafeClient();
-       
+     	 HttpClient client = new DefaultHttpClient();
+         
         httpResponse=null;
         try {
+        	
             httpResponse = client.execute(request);
             responseCode = httpResponse.getStatusLine().getStatusCode();
             message = httpResponse.getStatusLine().getReasonPhrase();
