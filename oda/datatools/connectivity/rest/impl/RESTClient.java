@@ -79,15 +79,13 @@ public class RESTClient {
     {
     	jsonobjlist = jo;
     }
-    public void httpGet(String urlStr) throws IOException {
+    public int  httpGet(String urlStr) throws IOException {
 		  URL url = new URL(urlStr);
 		  System.out.println(url.toString());
 		  HttpURLConnection conn =
 		      (HttpURLConnection) url.openConnection();
 		  responseCode=conn.getResponseCode();
-		  if (conn.getResponseCode() != 200) {
-		    throw new IOException(conn.getResponseMessage());
-		  }
+		
 		  BufferedReader rd = new BufferedReader(
 		      new InputStreamReader(conn.getInputStream()));
 		  StringBuilder sb = new StringBuilder();
@@ -99,6 +97,7 @@ public class RESTClient {
 		  
 		  rd.close();
 		  conn.disconnect();
+		  return responseCode;
 		}
     public void  Execute(RequestMethod method) throws Exception
     {
@@ -127,15 +126,21 @@ public class RESTClient {
                 }
       
                String s=combinedParams.toString();
-      	
-      		   System.out.println(url+s);
-               httpGet(url+s);
+               int responsecode= httpGet(url+s);
+               System.out.println(url+s);
+               while(responsecode==206)
+               {
+               	Thread.sleep(5);
+               	responsecode= httpGet(url+s);
+               }
+      		
+              
                break;
             }
             case POST:
             {
             		HttpPost request = new HttpPost(url);
-            		
+            		System.out.println(url);
             		if(jsonobjlist==null)
             		{
             			throw new Exception("Jason object is missing");

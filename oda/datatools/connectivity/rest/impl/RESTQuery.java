@@ -32,13 +32,14 @@ private int m_maxRows;
   private RESTParameterMetaData parametermetadata;
   private Map<Integer, Object> Param_pos;
   private Map<String,Object>  Param_name;
- 
-  private SearchRequest searchRequest;
+  private RESTinterface restinterface;
+  private Accesspattern accesspattern;
  
   public RESTQuery()
   {
 	  Param_pos=new  HashMap<Integer,Object>();
 	  Param_name=new  HashMap<String,Object>();
+	  restinterface=new RESTinterface();
   }
   public void cancel()
     throws OdaException, UnsupportedOperationException
@@ -69,9 +70,9 @@ private int m_maxRows;
   {
     this.logger.finest("EXECUTE QUERY");
 	parametermetadata=new RESTParameterMetaData(this.Param_pos);
-    searchRequest.setQueryText(this.queryText);
-    searchRequest.setRESTlist(Restlist);
-    IResultSet  resultSet= new RESTResultSet(searchRequest,this.resultsetmetadata);
+	restinterface.prepare();
+	restinterface.setRESTlist(Restlist);
+    IResultSet  resultSet= new RESTResultSet(restinterface,this.resultsetmetadata);
     resultSet.setMaxRows(getMaxRows());
     
     return resultSet;
@@ -139,11 +140,11 @@ public void prepare(String queryText)
 		 Method columnstype = cls.getDeclaredMethod(sequence.toString()+"Columns", noparams);
 		 columnstype.invoke(obj, null);
 		 Method columns_names = cls.getDeclaredMethod("getColumns", noparams);
-		
-		names=(List<String>) columns_names.invoke(obj, null);
+	
+		 names=(List<String>) columns_names.invoke(obj, null);
 		 Method columns_types = cls.getDeclaredMethod("getDatatype", noparams);
 		
-		types=(List<Class<?>>) columns_types.invoke(obj, null);
+		 types=(List<Class<?>>) columns_types.invoke(obj, null);
 	 }
 	 catch(Exception ex)
 	 {
@@ -246,15 +247,29 @@ public void prepare(String queryText)
     throws OdaException
   {
 	  this.Param_name.put(arg0, arg1);
-	  searchRequest=(SearchRequest) arg1;
-	 
+	  accesspattern=(Accesspattern) arg1;
+	  restinterface.setDatamappinglist(accesspattern.getDatamapping());
+	  restinterface.setDatamappingstringlist(accesspattern.getDatamappingstring());
+	  restinterface.setLimit(accesspattern.getLimit());
+	  restinterface.setMethodlist(accesspattern.getMethod());
+	  restinterface.setOffset(accesspattern.getOffset());
+	  restinterface.setParamlist(accesspattern.getParam());
+	  restinterface.setQuery(accesspattern.getQuery());
+	  
   }
 
   public void setObject(int arg0, Object arg1)
     throws OdaException
   {
 	  this.Param_pos.put(arg0, arg1);
-	  searchRequest=(SearchRequest) arg1;
+	  accesspattern=(Accesspattern) arg1;
+	  restinterface.setDatamappinglist(accesspattern.getDatamapping());
+	  restinterface.setDatamappingstringlist(accesspattern.getDatamappingstring());
+	  restinterface.setLimit(accesspattern.getLimit());
+	  restinterface.setMethodlist(accesspattern.getMethod());
+	  restinterface.setOffset(accesspattern.getOffset());
+	  restinterface.setParamlist(accesspattern.getParam());
+	  restinterface.setQuery(accesspattern.getQuery());
 	  
   }
 

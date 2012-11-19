@@ -26,10 +26,10 @@ public class RESTResultSet
   private Iterator<List<Object>> rowIter;
   private List<Object> curRow;
   private RESTResultSetMetaData resultSetMetaData;
-  private SearchRequest searchrequest;
+  private RESTinterface searchrequest;
     
   
-  public RESTResultSet(SearchRequest searchRequest,RESTResultSetMetaData resultSetMetaData) throws OdaException
+  public RESTResultSet(RESTinterface searchRequest,RESTResultSetMetaData resultSetMetaData) throws OdaException
   {
     this.resultSetMetaData = resultSetMetaData;
     this.searchrequest=searchRequest;
