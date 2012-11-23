@@ -14,12 +14,17 @@ import net.sf.json.JSONObject;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.ClientConnectionRequest;
+import org.apache.http.conn.ManagedClientConnection;
+import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.BasicHttpContext;
@@ -33,7 +38,10 @@ public class RESTClient {
     private String response;
     private HttpResponse httpResponse;
     private HttpClient client;
+    private HttpHost host;
+    private HttpRoute route;
     private final int HTTP_PARTIAL=206;
+    private ManagedClientConnection connection;
     public String getResponse() {
         return response;
     }
@@ -47,8 +55,7 @@ public class RESTClient {
     }
     public RESTClient()
     {
-    	 
-    }
+     }
 
     /*public int  httpGet(String urlStr) throws IOException {
 		  URL url = new URL(urlStr);
@@ -90,18 +97,11 @@ public class RESTClient {
             }
   
            String s=combinedParams.toString();
-           //int responsecode= httpGet(url+s);
            String thePath=url+s; 
            HttpGet request = new HttpGet(thePath);    	
-          
-           /*System.out.println(url+s);
-           while(responsecode==206)
-           {
-           	Thread.sleep(5);
-           	responsecode= httpGet(url+s);
-           }
-           return this.getResponse();*/
-           
+           host = new HttpHost(thePath);
+           route = new HttpRoute(host); 
+     
            responsecode=executeRequest(request);
            while(responsecode==this.HTTP_PARTIAL)
            {
@@ -143,15 +143,23 @@ public class RESTClient {
     
     private int executeRequest(HttpUriRequest request) throws OdaException
     {
-     	 client =RESTHttpClientFactory.getThreadSafeClient();
-     	
+     	client =RESTHttpClientFactory.getThreadSafeClient();
+     	ManagedClientConnection conn = null;
         httpResponse=null;
         try {
         	HttpContext context = new BasicHttpContext();
             httpResponse = client.execute(request,context);
             responseCode = httpResponse.getStatusLine().getStatusCode();
             message = httpResponse.getStatusLine().getReasonPhrase();
-          
+
+            ClientConnectionManager manager = client.getConnectionManager(); 
+            ClientConnectionRequest connRequest = manager.requestConnection(route, null);
+            try {
+				conn = connRequest.getConnection(0, null);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             HttpEntity entity = httpResponse.getEntity();
             
             
@@ -163,11 +171,14 @@ public class RESTClient {
               
             }
             EntityUtils.consume(entity);
+            conn.releaseConnection();
           
         } 
         catch(ConnectionClosedException ex)
         {
         	return HTTP_PARTIAL;
+        
+        	
         }
         catch (ClientProtocolException e) 
         {
