@@ -99,7 +99,7 @@ public class RESTClient {
            String s=combinedParams.toString();
            String thePath=url+s; 
            HttpGet request = new HttpGet(thePath);    	
-           host = new HttpHost(thePath);
+           host = new HttpHost(request.getURI().getPath());
            route = new HttpRoute(host); 
      
            responsecode=executeRequest(request);
@@ -114,7 +114,8 @@ public class RESTClient {
     public String  ExecutePost(List<JSONObject> jsonobjlist,String url) throws Exception
     {		
     		int responsecode;
-    		HttpPost request = new HttpPost(url);    		
+    		HttpPost request = new HttpPost(url);
+    	
     		if(jsonobjlist==null)
     		{
     			throw new Exception("Jason object is missing");
@@ -131,6 +132,9 @@ public class RESTClient {
             se.setContentType("application/json"); 
             se.setContentEncoding( new BasicHeader(HTTP.CONTENT_TYPE, "application/json")); 
             request.setEntity(se);
+        	host = new HttpHost(request.getURI().getPath());
+            route = new HttpRoute(host); 
+            
             responsecode=executeRequest(request);
             while(responsecode==this.HTTP_PARTIAL)
             {
