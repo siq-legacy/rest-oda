@@ -1,24 +1,28 @@
 package oda.datatools.connectivity.rest.impl;
 
 import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.params.HttpParams;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 
-public class RESTHttpClientFactory {
+public class RESTHttpClientFactory
+{
+  private static HttpClient client;
 
-    private static HttpClient client;
-
-    public synchronized static HttpClient getThreadSafeClient() {
-        if (client != null)
-            return client;
-        client = new DefaultHttpClient();
-        ClientConnectionManager mgr = client.getConnectionManager();
-        HttpParams params = client.getParams();
-        client = new DefaultHttpClient(new ThreadSafeClientConnManager(params,
-                mgr.getSchemeRegistry()), params);
-        return client;
-
+  public static synchronized HttpClient getThreadSafeClient()
+  {
+    if (client != null)
+    {
+    	return client;
     }
+    else
+    {
+    	  PoolingClientConnectionManager cm = new PoolingClientConnectionManager();
+          cm.setMaxTotal(100);
+          cm.setDefaultMaxPerRoute(10);
+          client = new DefaultHttpClient(cm);
+    	  return client;
+    }
+    
+ 
+  }
 }

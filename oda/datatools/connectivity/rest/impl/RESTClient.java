@@ -4,8 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -13,30 +12,28 @@ import java.util.List;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.httpclient.NameValuePair;
+import org.apache.http.ConnectionClosedException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 public class RESTClient {
-
-   
-
-    private ArrayList <NameValuePair> params;
-    private ArrayList <NameValuePair> headers;
-    private String url;
-    private List<JSONObject> jsonobjlist;
     private int responseCode;
     private String message;
     private String response;
     private HttpResponse httpResponse;
-
+    private HttpClient client;
+    private final int HTTP_PARTIAL=206;
     public String getResponse() {
         return response;
     }
@@ -48,44 +45,16 @@ public class RESTClient {
     public int getResponseCode() {
         return responseCode;
     }
-    public void clearParameters()
-    {
-    	params=null;
-    	headers=null;
-    	jsonobjlist=null;
-    	url=null;
-    }
-    public void setURL(String url)
-    {
-    	this.url = url;
-        params = new ArrayList<NameValuePair>();
-        headers = new ArrayList<NameValuePair>();
-    }
     public RESTClient()
     {
-        
+    	 
     }
 
-    public void AddParam(String name, String value)
-    {
-        params.add(new NameValuePair(name, value));
-    }
-
-    public void AddHeader(String name, String value)
-    {
-        headers.add(new NameValuePair(name, value));
-    }
-    public void AddJsonPost(List<JSONObject> jo)
-    {
-    	jsonobjlist = jo;
-    }
-    public int  httpGet(String urlStr) throws IOException {
+    /*public int  httpGet(String urlStr) throws IOException {
 		  URL url = new URL(urlStr);
-		  System.out.println(url.toString());
 		  HttpURLConnection conn =
 		      (HttpURLConnection) url.openConnection();
 		  responseCode=conn.getResponseCode();
-		
 		  BufferedReader rd = new BufferedReader(
 		      new InputStreamReader(conn.getInputStream()));
 		  StringBuilder sb = new StringBuilder();
@@ -98,100 +67,110 @@ public class RESTClient {
 		  rd.close();
 		  conn.disconnect();
 		  return responseCode;
-		}
-    public void  Execute(RequestMethod method) throws Exception
+		}*/
+    public String  ExecuteGet(ArrayList <NameValuePair> params,String url) throws Exception
     {
-    	 switch(method) 
-        {
-           case GET:
-            {
-                String combinedParams = "";
-                if(!params.isEmpty()){
-                    combinedParams += "?";
-                    
-                    for(NameValuePair p : params)
+    		int responsecode;
+            String combinedParams = "";
+            if(!params.isEmpty()){
+                combinedParams += "?";
+                
+                for(NameValuePair p : params)
+                {
+                    String paramString = p.getName() + "=" + URLEncoder.encode(p.getValue());
+                    if(combinedParams.length() > 1)
                     {
-                        String paramString = p.getName() + "=" + p.getValue();
-                        if(combinedParams.length() > 1)
-                        {
-                        	combinedParams  +=  "&&" + paramString;
-                        }
-                        else
-                        {
-                        	combinedParams += paramString;
-                        }
+                    	combinedParams  +=  "&&" + paramString;
                     }
-                  
-                 
-                }
-      
-               String s=combinedParams.toString();
-               int responsecode= httpGet(url+s);
-               System.out.println(url+s);
-               while(responsecode==206)
-               {
-               	Thread.sleep(5);
-               	responsecode= httpGet(url+s);
-               }
-      		
-              
-               break;
-            }
-            case POST:
-            {
-            		HttpPost request = new HttpPost(url);
-            		System.out.println(url);
-            		if(jsonobjlist==null)
-            		{
-            			throw new Exception("Jason object is missing");
-            		}
-            		Iterator<JSONObject> itrjb=jsonobjlist.iterator(); 
-            		String pass = "";
-            		while(itrjb.hasNext())
-            		{
-            			JSONObject jb=itrjb.next();
-            			pass=jb.toString()+pass;           			
-            		}
-            		request.addHeader("Content-type","application/json");
-                    StringEntity se = new StringEntity(pass);
-                    se.setContentType("application/json"); 
-                    se.setContentEncoding( new BasicHeader(HTTP.CONTENT_TYPE, "application/json")); 
-                    request.setEntity(se);
-                    httpResponse=executeRequest(request);
-                    while(httpResponse!=null &&httpResponse.getStatusLine().getStatusCode()==206)
+                    else
                     {
-                    	Thread.sleep(5);
-                    	httpResponse=executeRequest(request);
+                    	combinedParams += paramString;
                     }
-                break;
+                }             
             }
-        }
-       
-       
+  
+           String s=combinedParams.toString();
+           //int responsecode= httpGet(url+s);
+           String thePath=url+s; 
+           HttpGet request = new HttpGet(thePath);    	
+          
+           /*System.out.println(url+s);
+           while(responsecode==206)
+           {
+           	Thread.sleep(5);
+           	responsecode= httpGet(url+s);
+           }
+           return this.getResponse();*/
+           
+           responsecode=executeRequest(request);
+           while(responsecode==this.HTTP_PARTIAL)
+           {
+           	Thread.sleep(5);
+           	responsecode=executeRequest(request);
+           }
+           request.abort();
+           return this.getResponse();
+    }
+    public String  ExecutePost(List<JSONObject> jsonobjlist,String url) throws Exception
+    {		
+    		int responsecode;
+    		HttpPost request = new HttpPost(url);    		
+    		if(jsonobjlist==null)
+    		{
+    			throw new Exception("Jason object is missing");
+    		}
+    		Iterator<JSONObject> itrjb=jsonobjlist.iterator(); 
+    		String pass = "";
+    		while(itrjb.hasNext())
+    		{
+    			JSONObject jb=itrjb.next();
+    			pass=jb.toString()+pass;           			
+    		}
+    		request.addHeader("Content-type","application/json");
+            StringEntity se = new StringEntity(pass);
+            se.setContentType("application/json"); 
+            se.setContentEncoding( new BasicHeader(HTTP.CONTENT_TYPE, "application/json")); 
+            request.setEntity(se);
+            responsecode=executeRequest(request);
+            while(responsecode==this.HTTP_PARTIAL)
+            {
+            	Thread.sleep(5);
+            	responsecode=executeRequest(request);
+            }
+            request.abort();
+            return this.getResponse();
     }
     
-    private HttpResponse executeRequest(HttpUriRequest request) throws OdaException
+    private int executeRequest(HttpUriRequest request) throws OdaException
     {
-     	 HttpClient client = new DefaultHttpClient();
-         
+     	 client =RESTHttpClientFactory.getThreadSafeClient();
+     	
         httpResponse=null;
         try {
-        	
-            httpResponse = client.execute(request);
+        	HttpContext context = new BasicHttpContext();
+            httpResponse = client.execute(request,context);
             responseCode = httpResponse.getStatusLine().getStatusCode();
             message = httpResponse.getStatusLine().getReasonPhrase();
-            System.out.println("the Reason code is"+responseCode);
+          
             HttpEntity entity = httpResponse.getEntity();
             
             
-            if (entity != null) {
+            if (entity != null&&responseCode!=206) {
                 InputStream instream = entity.getContent();
                 response = convertStreamToString(instream);
                 instream.close();
-                
+                System.out.println("the Response length is"+response.length());
+              
             }
+            EntityUtils.consume(entity);
           
-        } catch (ClientProtocolException e)  {
+        } 
+        catch(ConnectionClosedException ex)
+        {
+        	return HTTP_PARTIAL;
+        }
+        catch (ClientProtocolException e) 
+        {
             client.getConnectionManager().shutdown();
             e.printStackTrace();
             throw new OdaException("Error in RESTClient  HttpResponse");
@@ -200,7 +179,7 @@ public class RESTClient {
             e.printStackTrace();
             throw new OdaException("Error in RESTClient I/O HttpResponse");
         }
-		return httpResponse;
+		return responseCode;
 	
     }
 

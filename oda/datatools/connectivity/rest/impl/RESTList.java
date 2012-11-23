@@ -18,7 +18,11 @@ public class RESTList
 }
 
 private List<Object> row;
-  private List<List<Object>> rowlist;
+  public List<Object> getRow() {
+	return row;
+}
+
+private List<List<Object>> rowlist;
 
   public List<Class<?>> getDatatype()
   {
@@ -50,7 +54,7 @@ private List<Object> row;
 	  this.row =  Arrays.asList(new Object[this.columnlist.size()]);
 	  
   }
-  public void freeMem()
+  public void reset()
   {
 	  
 	  this.rowlist = new LinkedList<List<Object>>();

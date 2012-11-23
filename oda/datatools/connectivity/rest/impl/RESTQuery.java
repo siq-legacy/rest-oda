@@ -18,8 +18,6 @@ import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.eclipse.datatools.connectivity.oda.SortSpec;
 import org.eclipse.datatools.connectivity.oda.spec.QuerySpecification;
 
-import siqcolumns.Siqcolumns;
-
 public class RESTQuery
   implements IQuery
 {
@@ -32,14 +30,14 @@ private int m_maxRows;
   private RESTParameterMetaData parametermetadata;
   private Map<Integer, Object> Param_pos;
   private Map<String,Object>  Param_name;
-  private RESTinterface restinterface;
-  private Accesspattern accesspattern;
+  private RESTInterface restinterface;
+  private AccessPattern accesspattern;
  
   public RESTQuery()
   {
 	  Param_pos=new  HashMap<Integer,Object>();
 	  Param_name=new  HashMap<String,Object>();
-	  restinterface=new RESTinterface();
+	  restinterface=new RESTInterface();
   }
   public void cancel()
     throws OdaException, UnsupportedOperationException
@@ -247,14 +245,12 @@ public void prepare(String queryText)
     throws OdaException
   {
 	  this.Param_name.put(arg0, arg1);
-	  accesspattern=(Accesspattern) arg1;
-	  restinterface.setDatamappinglist(accesspattern.getDatamapping());
+	  accesspattern=(AccessPattern) arg1;
 	  restinterface.setDatamappingstringlist(accesspattern.getDatamappingstring());
-	  restinterface.setLimit(accesspattern.getLimit());
 	  restinterface.setMethodlist(accesspattern.getMethod());
-	  restinterface.setOffset(accesspattern.getOffset());
 	  restinterface.setParamlist(accesspattern.getParam());
 	  restinterface.setQuery(accesspattern.getQuery());
+	  restinterface.setcolumnmappinglist(accesspattern.getColumnmappingstring());
 	  
   }
 
@@ -262,14 +258,12 @@ public void prepare(String queryText)
     throws OdaException
   {
 	  this.Param_pos.put(arg0, arg1);
-	  accesspattern=(Accesspattern) arg1;
-	  restinterface.setDatamappinglist(accesspattern.getDatamapping());
+	  accesspattern=(AccessPattern) arg1;
 	  restinterface.setDatamappingstringlist(accesspattern.getDatamappingstring());
-	  restinterface.setLimit(accesspattern.getLimit());
 	  restinterface.setMethodlist(accesspattern.getMethod());
-	  restinterface.setOffset(accesspattern.getOffset());
 	  restinterface.setParamlist(accesspattern.getParam());
 	  restinterface.setQuery(accesspattern.getQuery());
+	  restinterface.setcolumnmappinglist(accesspattern.getColumnmappingstring());
 	  
   }
 

@@ -26,10 +26,10 @@ public class RESTResultSet
   private Iterator<List<Object>> rowIter;
   private List<Object> curRow;
   private RESTResultSetMetaData resultSetMetaData;
-  private RESTinterface searchrequest;
+  private RESTInterface searchrequest;
     
   
-  public RESTResultSet(RESTinterface searchRequest,RESTResultSetMetaData resultSetMetaData) throws OdaException
+  public RESTResultSet(RESTInterface searchRequest,RESTResultSetMetaData resultSetMetaData) throws OdaException
   {
     this.resultSetMetaData = resultSetMetaData;
     this.searchrequest=searchRequest;
@@ -56,10 +56,15 @@ public class RESTResultSet
   public BigDecimal getBigDecimal(int index)
     throws OdaException
   {
+	if(this.curRow.get(index-1)==null)
+		return null;
+	else
+	{
+		String ans=this.curRow.get(index-1).toString();
+		BigDecimal ansin=new BigDecimal(ans);
+	    return ansin;
+	}
 	
-	String ans=this.curRow.get(index-1).toString();
-	BigDecimal ansin=new BigDecimal(ans);
-    return ansin;
   }
 
   public BigDecimal getBigDecimal(String columnName)
@@ -84,8 +89,13 @@ public class RESTResultSet
   public boolean getBoolean(int index)
     throws OdaException
   {
-	
-    return ((Boolean)this.curRow.get(index-1)).booleanValue();
+
+	if(this.curRow.get(index-1)==null)
+		return false;
+	else
+	{
+		return ((Boolean)this.curRow.get(index-1)).booleanValue();
+	}
   }
 
   public boolean getBoolean(String columnName)
@@ -111,17 +121,22 @@ public class RESTResultSet
   public Date getDate(int index)
     throws OdaException
   {  
-	  
-	String ans=this.curRow.get(index-1).toString();
-	SimpleDateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-	java.sql.Date formatdate = null;
-    try {
-    	formatdate= (Date) dateformat.parse(ans);
-	} catch (ParseException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	return formatdate;
+	  if(this.curRow.get(index-1)==null)
+			return null;
+	  else
+	  {
+		  String ans=this.curRow.get(index-1).toString();
+			SimpleDateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			java.sql.Date formatdate = null;
+		    try {
+		    	formatdate= (Date) dateformat.parse(ans);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return formatdate;
+	  }
+	
   }
 
   public Date getDate(String columnName)
@@ -133,9 +148,14 @@ public class RESTResultSet
 
   public double getDouble(int index)
     throws OdaException
-  {
+  {  
+	  if(this.curRow.get(index-1)==null)
+		  return 0.0;
+	  else
+	  {
 	  	String ans=this.curRow.get(index-1).toString();
 	    return new Double(ans);
+	  }
   }
 
   public double getDouble(String columnName)
@@ -147,9 +167,15 @@ public class RESTResultSet
   public int getInt(int index)
     throws OdaException
   {
-	String ans=this.curRow.get(index-1).toString();
-	Integer ansin=new Integer(ans);
-    return ansin;
+	  if(this.curRow.get(index-1)==null)
+		  return 0;
+	  else
+	  {
+		    String ans=this.curRow.get(index-1).toString();
+			Integer ansin=new Integer(ans);
+		    return ansin;
+	  }
+	
   }
 
   public int getInt(String columnName)
@@ -186,30 +212,49 @@ public class RESTResultSet
   public String getString(int index)
     throws OdaException
   {
-    return (String)this.curRow.get(index-1);
+	 
+	  if(this.curRow.get(index-1)==null)
+		  return null;
+	  else
+	  {
+		  return (String)this.curRow.get(index-1);
+	  }
+   
   }
 
   public String getString(String columnname)
     throws OdaException
   {
-    return (String)this.curRow.get(findColumn(columnname));
+	  if(this.curRow.get(findColumn(columnname))==null)
+		  return null;
+	  else
+	  {
+		  return (String)this.curRow.get(findColumn(columnname));
+	  }
+  
   }
 
   public Time getTime(int index)
     throws OdaException
   {
-	  String ans=this.curRow.get(index-1).toString();
-	  SimpleDateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-	  java.sql.Date formatdate = null;
-	  try {
-		  formatdate= (Date) dateformat.parse(ans);
-	  } catch (ParseException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+	  if(this.curRow.get(index-1)==null)
+		  return null;
+	  else
+	  {
+		  String ans=this.curRow.get(index-1).toString();
+		  SimpleDateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		  java.sql.Date formatdate = null;
+		  try {
+			  formatdate= (Date) dateformat.parse(ans);
+		  } catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		  }
+		 
+		  Time time=new Time(formatdate.getTime());
+	      return time;
 	  }
 	 
-	  Time time=new Time(formatdate.getTime());
-      return time;
   }
 
   public Time getTime(String columnName)
@@ -221,17 +266,23 @@ public class RESTResultSet
   public Timestamp getTimestamp(int index)
     throws OdaException
   {
-	  String ans=this.curRow.get(index-1).toString();
-	  SimpleDateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-	  java.sql.Date formatdate = null;
-	  try {
-		  formatdate= (Date) dateformat.parse(ans);
-	  } catch (ParseException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+	  if(this.curRow.get(index-1)==null)
+		  return null;
+	  else
+	  {
+		  String ans=this.curRow.get(index-1).toString();
+		  SimpleDateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		  java.sql.Date formatdate = null;
+		  try {
+			  formatdate= (Date) dateformat.parse(ans);
+		  } catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		  }
+		  Timestamp tmp=new Timestamp(formatdate.getTime());
+		  return tmp;
 	  }
-	  Timestamp tmp=new Timestamp(formatdate.getTime());
-	  return tmp;
+	 
   }
 
   public Timestamp getTimestamp(String columnName)
