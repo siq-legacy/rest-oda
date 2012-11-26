@@ -5,11 +5,11 @@ import java.util.LinkedList;
 import java.util.List;
 public class RESTList
 {
-  List<String> columnlist;
+  List<String> columnList;
   
   
-  public void setColumnlist(List<String> columnlist) {
-	this.columnlist = columnlist;
+  public void setColumnlist(List<String> columnList) {
+	this.columnList = columnList;
 }
 
   private List<Class<?>> datatype;
@@ -22,18 +22,18 @@ private List<Object> row;
 	return row;
 }
 
-private List<List<Object>> rowlist;
+private List<List<Object>> rowList;
 
   public List<Class<?>> getDatatype()
   {
     return this.datatype;
   }
   public List<String> getColumnlist() {
-    return this.columnlist;
+    return this.columnList;
   }
 
   public String toString() {
-    return this.rowlist.toString();
+    return this.rowList.toString();
   }
 
   public RESTList()
@@ -51,21 +51,21 @@ private List<List<Object>> rowlist;
   }
 
   public void createRow() {
-	  this.row =  Arrays.asList(new Object[this.columnlist.size()]);
+	  this.row =  Arrays.asList(new Object[this.columnList.size()]);
 	  
   }
   public void reset()
   {
 	  
-	  this.rowlist = new LinkedList<List<Object>>();
+	  this.rowList = new LinkedList<List<Object>>();
   }
 
   public void addtoRowList()
   {
-    this.rowlist.add(this.row);
+    this.rowList.add(this.row);
   }
 
   public List<List<Object>> getRows() {
-    return this.rowlist;
+    return this.rowList;
   }
 }

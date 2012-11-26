@@ -24,15 +24,15 @@ public class RESTResultSet
   private int m_currentRowId;
   private List<List<Object>> rows = new ArrayList<List<Object>>();
   private Iterator<List<Object>> rowIter;
-  private List<Object> curRow;
+  private List<Object> currentRow;
   private RESTResultSetMetaData resultSetMetaData;
-  private RESTInterface searchrequest;
+  private RESTInterface searchRequest;
     
   
   public RESTResultSet(RESTInterface searchRequest,RESTResultSetMetaData resultSetMetaData) throws OdaException
   {
     this.resultSetMetaData = resultSetMetaData;
-    this.searchrequest=searchRequest;
+    this.searchRequest=searchRequest;
    
     
     setQuery();
@@ -56,11 +56,11 @@ public class RESTResultSet
   public BigDecimal getBigDecimal(int index)
     throws OdaException
   {
-	if(this.curRow.get(index-1)==null)
+	if(this.currentRow.get(index-1)==null)
 		return null;
 	else
 	{
-		String ans=this.curRow.get(index-1).toString();
+		String ans=this.currentRow.get(index-1).toString();
 		BigDecimal ansin=new BigDecimal(ans);
 	    return ansin;
 	}
@@ -90,11 +90,11 @@ public class RESTResultSet
     throws OdaException
   {
 
-	if(this.curRow.get(index-1)==null)
+	if(this.currentRow.get(index-1)==null)
 		return false;
 	else
 	{
-		return ((Boolean)this.curRow.get(index-1)).booleanValue();
+		return ((Boolean)this.currentRow.get(index-1)).booleanValue();
 	}
   }
 
@@ -121,11 +121,11 @@ public class RESTResultSet
   public Date getDate(int index)
     throws OdaException
   {  
-	  if(this.curRow.get(index-1)==null)
+	  if(this.currentRow.get(index-1)==null)
 			return null;
 	  else
 	  {
-		  String ans=this.curRow.get(index-1).toString();
+		  String ans=this.currentRow.get(index-1).toString();
 			SimpleDateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 			java.sql.Date formatdate = null;
 		    try {
@@ -149,11 +149,11 @@ public class RESTResultSet
   public double getDouble(int index)
     throws OdaException
   {  
-	  if(this.curRow.get(index-1)==null)
+	  if(this.currentRow.get(index-1)==null)
 		  return 0.0;
 	  else
 	  {
-	  	String ans=this.curRow.get(index-1).toString();
+	  	String ans=this.currentRow.get(index-1).toString();
 	    return new Double(ans);
 	  }
   }
@@ -167,11 +167,11 @@ public class RESTResultSet
   public int getInt(int index)
     throws OdaException
   {
-	  if(this.curRow.get(index-1)==null)
+	  if(this.currentRow.get(index-1)==null)
 		  return 0;
 	  else
 	  {
-		    String ans=this.curRow.get(index-1).toString();
+		    String ans=this.currentRow.get(index-1).toString();
 			Integer ansin=new Integer(ans);
 		    return ansin;
 	  }
@@ -194,7 +194,7 @@ public class RESTResultSet
   public Object getObject(int index)
     throws OdaException
   {
-    return this.curRow.get(index-1);
+    return this.currentRow.get(index-1);
   }
 
   public Object getObject(String arg0)
@@ -213,11 +213,11 @@ public class RESTResultSet
     throws OdaException
   {
 	 
-	  if(this.curRow.get(index-1)==null)
+	  if(this.currentRow.get(index-1)==null)
 		  return null;
 	  else
 	  {
-		  return (String)this.curRow.get(index-1);
+		  return (String)this.currentRow.get(index-1);
 	  }
    
   }
@@ -225,11 +225,11 @@ public class RESTResultSet
   public String getString(String columnname)
     throws OdaException
   {
-	  if(this.curRow.get(findColumn(columnname))==null)
+	  if(this.currentRow.get(findColumn(columnname))==null)
 		  return null;
 	  else
 	  {
-		  return (String)this.curRow.get(findColumn(columnname));
+		  return (String)this.currentRow.get(findColumn(columnname));
 	  }
   
   }
@@ -237,11 +237,11 @@ public class RESTResultSet
   public Time getTime(int index)
     throws OdaException
   {
-	  if(this.curRow.get(index-1)==null)
+	  if(this.currentRow.get(index-1)==null)
 		  return null;
 	  else
 	  {
-		  String ans=this.curRow.get(index-1).toString();
+		  String ans=this.currentRow.get(index-1).toString();
 		  SimpleDateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		  java.sql.Date formatdate = null;
 		  try {
@@ -266,11 +266,11 @@ public class RESTResultSet
   public Timestamp getTimestamp(int index)
     throws OdaException
   {
-	  if(this.curRow.get(index-1)==null)
+	  if(this.currentRow.get(index-1)==null)
 		  return null;
 	  else
 	  {
-		  String ans=this.curRow.get(index-1).toString();
+		  String ans=this.currentRow.get(index-1).toString();
 		  SimpleDateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		  java.sql.Date formatdate = null;
 		  try {
@@ -295,7 +295,7 @@ public class RESTResultSet
   {
 		
 	  
-	    this.rows = this.searchrequest.executeQuery().getRows();
+	    this.rows = this.searchRequest.executeQuery().getRows();
 	    this.rowIter = this.rows.listIterator();
 	    this.setMaxRows(this.rows.size());
 	 
@@ -305,7 +305,7 @@ public class RESTResultSet
 	    if (this.rowIter.hasNext())
 	    {
 	      this.m_currentRowId += 1;
-	      this.curRow = ((List<Object>)this.rowIter.next());
+	      this.currentRow = ((List<Object>)this.rowIter.next());
 	      return true;
 	     
 	    }

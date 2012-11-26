@@ -2,31 +2,35 @@ package oda.datatools.connectivity.rest.impl;
 
 public class ColumnNameMapping {
 
-	/**
-	 * @param args
+	/*
+	 * This Class is used for the Following:
+	 * 		This is the class from which user will be able to provide input to the ColumnNameMapping vector in AccessPattern class.
+	 * 		1.sourceKey	->a key which is used as the sourcekey for the request in the level.
+	 * 		
 	 */
-	private String sourcekey;
-	private String sourcevalue;
-	private String destinationkey;
-	
-	public String getSourcekey() {
-		return sourcekey;
+	private String sourceKey;
+	private String sourceValue;
+	private String destinationKey;
+
+	public String getSourceKey() {
+		return sourceKey;
 	}
-	public void setSourcekey(String sourcekey) {
-		this.sourcekey = sourcekey;
+	public void setSourceKey(String sourceKey) {
+		this.sourceKey = sourceKey;
 	}
-	public String getSourcevalue() {
-		return sourcevalue;
+	public String getSourceValue() {
+		return sourceValue;
 	}
-	public void setSourcevalue(String sourcevalue) {
-		this.sourcevalue = sourcevalue;
+	public void setSourceValue(String sourceValue) {
+		this.sourceValue = sourceValue;
 	}
-	public String getDestinationkey() {
-		return destinationkey;
+	public String getDestinationKey() {
+		return destinationKey;
 	}
-	public void setDestinationkey(String destinationkey) {
-		this.destinationkey = destinationkey;
+	public void setDestinationKey(String destinationKey) {
+		this.destinationKey = destinationKey;
 	}
+
 	
 
 }

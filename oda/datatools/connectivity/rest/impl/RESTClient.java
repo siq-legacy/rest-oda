@@ -8,9 +8,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import net.sf.json.JSONObject;
-
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.HttpEntity;
@@ -32,6 +30,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.eclipse.datatools.connectivity.oda.OdaException;
+
 public class RESTClient {
     private int responseCode;
     private String message;
@@ -41,7 +40,7 @@ public class RESTClient {
     private HttpHost host;
     private HttpRoute route;
     private final int HTTP_PARTIAL=206;
-    private ManagedClientConnection connection;
+    private int hitcounts;
     public String getResponse() {
         return response;
     }
@@ -55,29 +54,11 @@ public class RESTClient {
     }
     public RESTClient()
     {
-     }
-
-    /*public int  httpGet(String urlStr) throws IOException {
-		  URL url = new URL(urlStr);
-		  HttpURLConnection conn =
-		      (HttpURLConnection) url.openConnection();
-		  responseCode=conn.getResponseCode();
-		  BufferedReader rd = new BufferedReader(
-		      new InputStreamReader(conn.getInputStream()));
-		  StringBuilder sb = new StringBuilder();
-		  String line;
-		  while ((line = rd.readLine()) != null) {
-		    sb.append(line);
-		  }
-		  response=sb.toString();
-		  
-		  rd.close();
-		  conn.disconnect();
-		  return responseCode;
-		}*/
+    	hitcounts=0;
+    }
     public String  ExecuteGet(ArrayList <NameValuePair> params,String url) throws Exception
     {
-    		int responsecode;
+    		HttpResponse response;
             String combinedParams = "";
             if(!params.isEmpty()){
                 combinedParams += "?";
@@ -102,23 +83,37 @@ public class RESTClient {
            host = new HttpHost(request.getURI().getPath());
            route = new HttpRoute(host); 
      
-           responsecode=executeRequest(request);
-           while(responsecode==this.HTTP_PARTIAL)
+           response=executeRequest(request);
+           while(response.getStatusLine().getStatusCode()==this.HTTP_PARTIAL)
            {
-           	Thread.sleep(5);
-           	responsecode=executeRequest(request);
+	        	this.hitcounts+=1;
+	        	if(hitcounts==500)
+	        	{
+	        		 throw new OdaException("Error in Data  from Server");
+	        	}
+	           	Thread.sleep(5);
+	           	try
+	           	{
+	           	 	response=executeRequest(request);
+	           	}
+	           	catch(HttpRetryException ex)
+	           	{
+	           		System.out.println("Sending the Request again");
+	           	}
+	          
            }
+           this.hitcounts=0;
            request.abort();
            return this.getResponse();
     }
     public String  ExecutePost(List<JSONObject> jsonobjlist,String url) throws Exception
     {		
-    		int responsecode;
+    		HttpResponse response;
     		HttpPost request = new HttpPost(url);
     	
     		if(jsonobjlist==null)
     		{
-    			throw new Exception("Jason object is missing");
+    			throw new Exception("Required JSON object for a POST is missing");
     		}
     		Iterator<JSONObject> itrjb=jsonobjlist.iterator(); 
     		String pass = "";
@@ -135,17 +130,30 @@ public class RESTClient {
         	host = new HttpHost(request.getURI().getPath());
             route = new HttpRoute(host); 
             
-            responsecode=executeRequest(request);
-            while(responsecode==this.HTTP_PARTIAL)
+            response=executeRequest(request);
+            while(response.getStatusLine().getStatusCode()==this.HTTP_PARTIAL)
             {
+            	this.hitcounts+=1;
+	        	if(hitcounts==500)
+	        	{
+	        		 throw new OdaException("Error in Data  from Server");
+	        	}
             	Thread.sleep(5);
-            	responsecode=executeRequest(request);
+            	try
+            	{
+            		response=executeRequest(request);
+            	}
+            	catch(HttpRetryException ex)
+            	{
+            		System.out.println("Sending the Request again");
+            	}
             }
+            this.hitcounts=0;
             request.abort();
             return this.getResponse();
     }
     
-    private int executeRequest(HttpUriRequest request) throws OdaException
+    private HttpResponse executeRequest(HttpUriRequest request) throws OdaException,HttpRetryException
     {
      	client =RESTHttpClientFactory.getThreadSafeClient();
      	ManagedClientConnection conn = null;
@@ -161,18 +169,17 @@ public class RESTClient {
             try {
 				conn = connRequest.getConnection(0, null);
 			} catch (InterruptedException e) {
+				
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
             HttpEntity entity = httpResponse.getEntity();
             
             
-            if (entity != null&&responseCode!=206) {
+            if (entity != null&&responseCode!=this.HTTP_PARTIAL) {
                 InputStream instream = entity.getContent();
                 response = convertStreamToString(instream);
-                instream.close();
-                System.out.println("the Response length is"+response.length());
-              
+                instream.close();        
             }
             EntityUtils.consume(entity);
             conn.releaseConnection();
@@ -180,9 +187,7 @@ public class RESTClient {
         } 
         catch(ConnectionClosedException ex)
         {
-        	return HTTP_PARTIAL;
-        
-        	
+        	throw new HttpRetryException();
         }
         catch (ClientProtocolException e) 
         {
@@ -194,7 +199,7 @@ public class RESTClient {
             e.printStackTrace();
             throw new OdaException("Error in RESTClient I/O HttpResponse");
         }
-		return responseCode;
+		return httpResponse;
 	
     }
 

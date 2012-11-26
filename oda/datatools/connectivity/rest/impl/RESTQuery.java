@@ -1,5 +1,4 @@
 package oda.datatools.connectivity.rest.impl;
-
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -9,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
@@ -22,22 +20,22 @@ public class RESTQuery
   implements IQuery
 {
  
-private int m_maxRows;
+  private int m_maxRows;
   private String queryText;
   protected Logger logger = Logger.getLogger(RESTQuery.class.getName());
-  private RESTList Restlist;
-  private RESTResultSetMetaData resultsetmetadata;
-  private RESTParameterMetaData parametermetadata;
-  private Map<Integer, Object> Param_pos;
-  private Map<String,Object>  Param_name;
-  private RESTInterface restinterface;
-  private AccessPattern accesspattern;
+  private RESTList restList;
+  private RESTResultSetMetaData resultsetMetaData;
+  private RESTParameterMetaData parameterMetaData;
+  private Map<Integer, Object> paramPositions;
+  private Map<String,Object>  parameterNames;
+  private RESTInterface restInterface;
+  private AccessPattern accessPattern;
  
   public RESTQuery()
   {
-	  Param_pos=new  HashMap<Integer,Object>();
-	  Param_name=new  HashMap<String,Object>();
-	  restinterface=new RESTInterface();
+	  paramPositions=new  HashMap<Integer,Object>();
+	  parameterNames=new  HashMap<String,Object>();
+	  restInterface=new RESTInterface();
   }
   public void cancel()
     throws OdaException, UnsupportedOperationException
@@ -47,7 +45,7 @@ private int m_maxRows;
 //this is for testing purpose
  /* private void testsiq(String methodName) throws OdaException
   {
-    if ((this.Restlist == null) || (this.Restlist.getRows() == null) || (this.Restlist.getRows().size() == 0))
+    if ((this.restList == null) || (this.restList.getRows() == null) || (this.restList.getRows().size() == 0))
       throw new OdaException("Data Feed is null or empty in " + methodName);
   }
 */
@@ -67,17 +65,17 @@ private int m_maxRows;
     throws OdaException
   {
     this.logger.finest("EXECUTE QUERY");
-	parametermetadata=new RESTParameterMetaData(this.Param_pos);
-	restinterface.prepare();
-	restinterface.setRESTlist(Restlist);
-    IResultSet  resultSet= new RESTResultSet(restinterface,this.resultsetmetadata);
+	parameterMetaData=new RESTParameterMetaData(this.paramPositions);
+	restInterface.prepare();
+	restInterface.setRESTlist(restList);
+    IResultSet  resultSet= new RESTResultSet(restInterface,this.resultsetMetaData);
     resultSet.setMaxRows(getMaxRows());
     
     return resultSet;
   }
 
 
-  public int findInParameter(String arg0)
+  public int findInParameter(String paramPosition)
     throws OdaException
   {
 	  
@@ -99,15 +97,15 @@ private int m_maxRows;
   public IResultSetMetaData getMetaData()
     throws OdaException
   {
-    this.logger.finest("ResultSetMetaData");
-    return resultsetmetadata;
+    this.logger.finest("resultsetMetaData");
+    return resultsetMetaData;
   }
 
   public IParameterMetaData getParameterMetaData()
     throws OdaException
   {
     this.logger.finest("GetParameterMetaData");
-    return parametermetadata;
+    return parameterMetaData;
   }
 
   public SortSpec getSortSpec()
@@ -151,10 +149,10 @@ public void prepare(String queryText)
 		 
 	 }
 	 
-	 this.Restlist = new RESTList();
-	 this.Restlist.setColumnlist(names);
-	 this.Restlist.setDatatype(types);
-	 resultsetmetadata=new RESTResultSetMetaData(this.Restlist);
+	 this.restList = new RESTList();
+	 this.restList.setColumnlist(names);
+	 this.restList.setDatatype(types);
+	 resultsetMetaData=new RESTResultSetMetaData(this.restList);
   }
 
   public void setAppContext(Object context)
@@ -163,65 +161,65 @@ public void prepare(String queryText)
     this.logger.finest("SIQ CONTEXT ");
   }
 
-  public void setBigDecimal(String arg0, BigDecimal arg1)
+  public void setBigDecimal(String paramName, BigDecimal paramValue)
     throws OdaException
   {
-	  this.Param_name.put(arg0, arg1);
+	  this.parameterNames.put(paramName, paramValue);
   }
 
-  public void setBigDecimal(int arg0, BigDecimal arg1)
+  public void setBigDecimal(int paramPosition, BigDecimal paramValue)
     throws OdaException
   {
-	  this.Param_pos.put(arg0, arg1);
+	  this.paramPositions.put(paramPosition, paramValue);
   }
 
-  public void setBoolean(String arg0, boolean arg1)
+  public void setBoolean(String paramName, boolean paramValue)
     throws OdaException
   {
-	  this.Param_name.put(arg0, arg1);
+	  this.parameterNames.put(paramName, paramValue);
   }
 
-  public void setBoolean(int arg0, boolean arg1)
+  public void setBoolean(int paramPosition, boolean paramValue)
     throws OdaException
   {
-	  this.Param_pos.put(arg0, arg1);
+	  this.paramPositions.put(paramPosition, paramValue);
   }
 
-  public void setDate(String arg0, Date arg1)
+  public void setDate(String paramName, Date paramValue)
     throws OdaException
   {
-	  this.Param_name.put(arg0, arg1);
+	  this.parameterNames.put(paramName, paramValue);
   }
 
-  public void setDate(int arg0, Date arg1)
+  public void setDate(int paramPosition, Date paramValue)
     throws OdaException
   {
-	  this.Param_pos.put(arg0, arg1);
+	  this.paramPositions.put(paramPosition, paramValue);
   }
 
-  public void setDouble(String arg0, double arg1)
+  public void setDouble(String paramName, double paramValue)
     throws OdaException
   {
-	  this.Param_name.put(arg0, arg1);
+	  this.parameterNames.put(paramName, paramValue);
   }
 
-  public void setDouble(int arg0, double arg1)
+  public void setDouble(int paramPosition, double paramValue)
     throws OdaException
   {
-	  this.Param_pos.put(arg0, arg1);
+	  this.paramPositions.put(paramPosition, paramValue);
   }
 
-  public void setInt(String arg0, int arg1)
+  public void setInt(String paramName, int paramValue)
     throws OdaException
   {
-	  this.Param_name.put(arg0, arg1);
+	  this.parameterNames.put(paramName, paramValue);
 	
   }
 
-  public void setInt(int arg0, int arg1)
+  public void setInt(int paramPosition, int paramValue)
     throws OdaException
   {
-	  this.Param_pos.put(arg0, arg1);
+	  this.paramPositions.put(paramPosition, paramValue);
   }
 
   public void setMaxRows(int max)
@@ -231,39 +229,39 @@ public void prepare(String queryText)
     this.m_maxRows = max;
   }
 
-  public void setNull(String arg0)
+  public void setNull(String paramName)
     throws OdaException
   {
   }
 
-  public void setNull(int arg0)
+  public void setNull(int paramPosition)
     throws OdaException
   {
   }
 
-  public void setObject(String arg0, Object arg1)
+  public void setObject(String paramName, Object paramValue)
     throws OdaException
   {
-	  this.Param_name.put(arg0, arg1);
-	  accesspattern=(AccessPattern) arg1;
-	  restinterface.setDatamappingstringlist(accesspattern.getDatamappingstring());
-	  restinterface.setMethodlist(accesspattern.getMethod());
-	  restinterface.setParamlist(accesspattern.getParam());
-	  restinterface.setQuery(accesspattern.getQuery());
-	  restinterface.setcolumnmappinglist(accesspattern.getColumnmappingstring());
+	  this.parameterNames.put(paramName, paramValue);
+	  accessPattern=(AccessPattern) paramValue;
+	  restInterface.setDataMappingList(accessPattern.getDataMapping());
+	  restInterface.setRequestMethodList(accessPattern.getRequestMethod());
+	  restInterface.setParameterList(accessPattern.getRequestParameters());
+	  restInterface.setQuery(accessPattern.getQueryString());
+	  restInterface.setColumnMappingList(accessPattern.getColumnMapping());
 	  
   }
 
-  public void setObject(int arg0, Object arg1)
+  public void setObject(int paramPosition, Object paramValue)
     throws OdaException
   {
-	  this.Param_pos.put(arg0, arg1);
-	  accesspattern=(AccessPattern) arg1;
-	  restinterface.setDatamappingstringlist(accesspattern.getDatamappingstring());
-	  restinterface.setMethodlist(accesspattern.getMethod());
-	  restinterface.setParamlist(accesspattern.getParam());
-	  restinterface.setQuery(accesspattern.getQuery());
-	  restinterface.setcolumnmappinglist(accesspattern.getColumnmappingstring());
+	  this.paramPositions.put(paramPosition, paramValue);
+	  accessPattern=(AccessPattern) paramValue;
+	  restInterface.setDataMappingList(accessPattern.getDataMapping());
+	  restInterface.setRequestMethodList(accessPattern.getRequestMethod());
+	  restInterface.setParameterList(accessPattern.getRequestParameters());
+	  restInterface.setQuery(accessPattern.getQueryString());
+	  restInterface.setColumnMappingList(accessPattern.getColumnMapping());
 	  
   }
 
@@ -274,54 +272,54 @@ public void prepare(String queryText)
     this.logger.finest("Property " + name + " : " + value);
   }
 
-  public void setSortSpec(SortSpec arg0)
+  public void setSortSpec(SortSpec paramPosition)
     throws OdaException
   {
     throw new UnsupportedOperationException();
   }
 
-  public void setSpecification(QuerySpecification arg0)
+  public void setSpecification(QuerySpecification paramPosition)
     throws OdaException, UnsupportedOperationException
   {
 	  
   }
 
-  public void setString(String arg0, String arg1)
+  public void setString(String paramName, String paramValue)
     throws OdaException
   {
 	
-	  this.Param_name.put(arg0, arg1);
+	  this.parameterNames.put(paramName, paramValue);
 	  
   }
 
-  public void setString(int arg0, String arg1)
+  public void setString(int paramPosition, String paramValue)
     throws OdaException
   {
-	  this.Param_pos.put(arg0, arg1);
+	  this.paramPositions.put(paramPosition, paramValue);
 	
   }
 
-  public void setTime(String arg0, Time arg1)
+  public void setTime(String paramName, Time paramValue)
     throws OdaException
   {
-	  this.Param_name.put(arg0, arg1);
+	  this.parameterNames.put(paramName, paramValue);
   }
 
-  public void setTime(int arg0, Time arg1)
+  public void setTime(int paramPosition, Time paramValue)
     throws OdaException
   {
-	  this.Param_pos.put(arg0, arg1);
+	  this.paramPositions.put(paramPosition, paramValue);
   }
 
-  public void setTimestamp(String arg0, Timestamp arg1)
+  public void setTimestamp(String paramName, Timestamp paramValue)
     throws OdaException
   {
-	  this.Param_name.put(arg0, arg1);
+	  this.parameterNames.put(paramName, paramValue);
   }
 
-  public void setTimestamp(int arg0, Timestamp arg1)
+  public void setTimestamp(int paramPosition, Timestamp paramValue)
     throws OdaException
   {
-	  this.Param_pos.put(arg0, arg1);
+	  this.paramPositions.put(paramPosition, paramValue);
   }
 }

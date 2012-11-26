@@ -17,53 +17,53 @@ import org.eclipse.datatools.connectivity.oda.OdaException;
 public class RESTInterface {
 
 	private Vector<String> query;
-	private Vector<RequestMethod> methodlist;
-	private Vector<Map<String, Object>> paramlist;
-	private Vector<Map<String, String>> datamappingstringlist;
-	private Vector<ColumnNameMapping> columnmappinglist;
-	private Map<String, Object> datamappingsvalues;
-	private Map<Object, Object> columnsmappingsvalues;
+	private Vector<RequestMethod> requestMethodList;
+	private Vector<Map<String, Object>> parameterList;
+	private Vector<Map<String, String>> dataMappingList;
+	private Vector<ColumnNameMapping> columnMappingList;
+	private Map<String, Object> dataMapping;
+	private Map<Object, Object> columnMapping;
 	private int position=0;
-	private RESTList siqlist;
-	private RESTClient restclient;
+	private RESTList siqList;
+	private RESTClient restClient;
 	private String response;
 	private int offset;
 	private int limit;
-	private boolean limitreached;
-	private ColumnNameMapping columnnamemapping;
+	private boolean limitReached;
+	private ColumnNameMapping columnNameMapping;
 
 	public void setQuery(Vector<String> query) {
 		this.query = query;
 	}
-	public void setMethodlist(Vector<RequestMethod> methodlist) {
-		this.methodlist = methodlist;
+	public void setRequestMethodList(Vector<RequestMethod> requestMethodList) {
+		this.requestMethodList = requestMethodList;
 	}
-	public void setParamlist(Vector<Map<String, Object>> paramlist) {
-		this.paramlist = paramlist;
+	public void setParameterList(Vector<Map<String, Object>> parameterList) {
+		this.parameterList = parameterList;
 	}
-	public void setDatamappingstringlist(
-			Vector<Map<String, String>> datamappingstringlist) {
-		this.datamappingstringlist = datamappingstringlist;
+	public void setDataMappingList(
+			Vector<Map<String, String>> dataMappingList) {
+		this.dataMappingList = dataMappingList;
 	}
 	
 	
-	public void setcolumnmappinglist(
-			Vector<ColumnNameMapping> columnmappinglist) {
-		this.columnmappinglist = columnmappinglist;
+	public void setColumnMappingList(
+			Vector<ColumnNameMapping> columnMappingList) {
+		this.columnMappingList = columnMappingList;
 	}
 
 	public void prepare()
 	{
-		restclient=new RESTClient();
+		restClient=new RESTClient();
 		limit=500;
 		offset=0;
-		limitreached=false;
+		limitReached=false;
 		response=null;
-		columnsmappingsvalues=new HashMap<Object, Object>();
-		columnnamemapping=null;
+		columnMapping=new HashMap<Object, Object>();
+		columnNameMapping=null;
 	
 	}
-	private int fillColumnMappings(String response,ColumnNameMapping columnnamemapping)
+	private int fillColumnMappings(String response,ColumnNameMapping columnNameMapping)
 	{    
 		  JSONObject jb = JSONObject.fromObject(response);
 	      JSONArray jsonresourceobj = null;
@@ -79,30 +79,30 @@ public class RESTInterface {
 	      for (int j = 0; j < jsonresourceobj.size(); j++)
 		  {
 		        JSONObject obj1 = jsonresourceobj.getJSONObject(j);
-	        this.columnsmappingsvalues.put(obj1.get(columnnamemapping.getSourcekey()), obj1.get(columnnamemapping.getSourcevalue()));
+	        this.columnMapping.put(obj1.get(columnNameMapping.getSourceKey()), obj1.get(columnNameMapping.getSourceValue()));
 		  }
 	     return jsonresourceobj.size();
 	}
 	public RESTList executeQuery() throws OdaException
 	{
-		if(limitreached)
+		if(limitReached)
 		{
-			this.siqlist.reset();
-			return this.siqlist;
+			this.siqList.reset();
+			return this.siqList;
 		}
 		while(position<query.size())
 		{
-			RequestMethod method=methodlist.get(position);
-			Map<String, Object> param=paramlist.get(position);
+			RequestMethod method=requestMethodList.get(position);
+			Map<String, Object> param=parameterList.get(position);
 			 switch(method) 
 	         {
 	            case GET:
 	             {
 	            
-					if(datamappingsvalues!=null)
+					if(dataMapping!=null)
 					{
 					
-						for (Map.Entry<String, Object> entry : datamappingsvalues.entrySet())
+						for (Map.Entry<String, Object> entry : dataMapping.entrySet())
 						{
 							param.put(entry.getKey(),entry.getValue());
 						}
@@ -118,23 +118,23 @@ public class RESTInterface {
 					
 					try
 					{
-						response=restclient.ExecuteGet(params,query.get(position));
+						response=restClient.ExecuteGet(params,query.get(position));
 					}
 					catch(Exception ex)
 					{
 						ex.printStackTrace();
 						throw new OdaException("Data from the Server has Exception");
 					}
-					columnnamemapping=columnmappinglist.get(position);
-					if(columnnamemapping!=null)
+					columnNameMapping=columnMappingList.get(position);
+					if(columnNameMapping!=null)
 					{
-						int remaining=this.fillColumnMappings(response, columnnamemapping);
+						int remaining=this.fillColumnMappings(response, columnNameMapping);
 						if(remaining>=limit)
 						{
 							continue;
 						}
 					}
-					this.siqlist.reset();
+					this.siqList.reset();
 					break;
 	             }
 	            case POST: 
@@ -159,7 +159,7 @@ public class RESTInterface {
 					
 					try
 					{
-						response=restclient.ExecutePost(jsonlist,query.get(position));
+						response=restClient.ExecutePost(jsonlist,query.get(position));
 					}
 					catch(Exception ex)
 					{
@@ -175,11 +175,11 @@ public class RESTInterface {
 					{
 						throw new OdaException("Gateway has failed the response");
 					}
-					datamappingsvalues=new HashMap<String, Object>();
-					Map<String, String> datamappingstring=datamappingstringlist.get(position);
+					dataMapping=new HashMap<String, Object>();
+					Map<String, String> datamappingstring=dataMappingList.get(position);
 					for (Map.Entry<String, String> entry : datamappingstring.entrySet())
 					{
-						datamappingsvalues.put(entry.getValue(),returnstring.get(entry.getKey()));
+						dataMapping.put(entry.getValue(),returnstring.get(entry.getKey()));
 					}
 					break;
 		       }
@@ -202,20 +202,20 @@ public class RESTInterface {
 				   
 				      for (int j = 0; j < jsonresourceobj.size(); j++)
 					  {
-				    	    siqlist.createRow();
+				    	    siqList.createRow();
 					        JSONObject obj1 = jsonresourceobj.getJSONObject(j);
-					        extraction(obj1.toString(),j);  
-					        siqlist.addtoRowList();
+					        extraction(obj1.toString());  
+					        siqList.addtoRowList();
 					    
 					  }
 			      }
 				response=null;
-				if(siqlist.getRows().size()<500)
+				if(siqList.getRows().size()<500)
 				{
-					limitreached=true;
+					limitReached=true;
 				}
 			
-				return siqlist;
+				return siqList;
 			}
 			else
 			{
@@ -224,46 +224,46 @@ public class RESTInterface {
 			
 		}
 		
-		return siqlist;
+		return siqList;
 		
 	
 	}
 	public RESTList getRESTlist() {
-		return siqlist;
+		return siqList;
 	}
-	public void setRESTlist(RESTList siqlist) {
-		this.siqlist = siqlist;
+	public void setRESTlist(RESTList siqList) {
+		this.siqList = siqList;
 	}
 	
-	public void extraction(String obj1, int col) {
-	    JSONObject jsonobj = JSONObject.fromObject(obj1.toString());
+	public void extraction(String JSONString) {
+	    JSONObject jsonobj = JSONObject.fromObject(JSONString);
 	    Iterator i = jsonobj.entrySet().iterator();
 	    while (i.hasNext()) {
 	      Map.Entry e = (Map.Entry)i.next();
 	      if (e.getValue().getClass().getName() != "net.sf.json.JSONObject")
 	      {
-	    	    	for(int j=0;j<columnmappinglist.size();j++)
+	    	    	for(int j=0;j<columnMappingList.size();j++)
 	    	    	{
-	    	    		ColumnNameMapping columnnamemapping=columnmappinglist.get(j);
-	    	    		if(columnnamemapping!=null)
+	    	    		ColumnNameMapping columnNameMapping=columnMappingList.get(j);
+	    	    		if(columnNameMapping!=null)
 	    	    		{
-	    	    			int position=this.siqlist.getColumnlist().indexOf(e.getKey());
+	    	    			int position=this.siqList.getColumnlist().indexOf(e.getKey());
 	    	    	    	if(position!=-1)
-	    	    	    	if(columnnamemapping.getDestinationkey().equals(e.getKey())&&columnsmappingsvalues.get(e.getValue())!=null)
+	    	    	    	if(columnNameMapping.getDestinationKey().equals(e.getKey())&&columnMapping.get(e.getValue())!=null)
 	    	    	    	{
 	    	    	    		  
-	    	    			    	this.siqlist.addObj(columnsmappingsvalues.get(e.getValue()),position);
+	    	    			    	this.siqList.addObj(columnMapping.get(e.getValue()),position);
 	    	    	    	}
 	    	    	    	else
 	    	    	    	{
-	    	    	    			this.siqlist.addObj(e.getValue(),position);
+	    	    	    			this.siqList.addObj(e.getValue(),position);
 	    	    	    	}
 	    	    		}
     	    		    else
     		    	    {
-    		    	    	int position=this.siqlist.getColumnlist().indexOf(e.getKey());
+    		    	    	int position=this.siqList.getColumnlist().indexOf(e.getKey());
     		   		    	if(position!=-1)
-    		   		    	this.siqlist.addObj(e.getValue(),position);
+    		   		    	this.siqList.addObj(e.getValue(),position);
     		    	    }
 	    	    	}
 	    	   
@@ -285,16 +285,16 @@ public class RESTInterface {
 	      }
 	      else
 	      {
-	    	int position=this.siqlist.getColumnlist().indexOf(e.getKey());
+	    	int position=this.siqList.getColumnlist().indexOf(e.getKey());
 	    	if(position!=-1)
 	    	{
 	    		if(e.getValue().equals(key))
 	    		{
-	    			this.siqlist.addObj(value,position);
+	    			this.siqList.addObj(value,position);
 	    		}
 	    		else
 	    		{
-	    			this.siqlist.addObj(e.getValue().toString(),position);
+	    			this.siqList.addObj(e.getValue().toString(),position);
 	    		}
 	    		
 	    	}
@@ -338,11 +338,11 @@ public class RESTInterface {
 					  {
 					        
 					        JSONObject obj2 = jsonresourceobj.getJSONObject(j);
-					      	this.siqlist.createRow();
+					      	this.siqList.createRow();
 				        	catalyst2(obj2.toString(),j,key,value);
-				        	if(this.siqlist.getRow().contains(value))
+				        	if(this.siqList.getRow().contains(value))
 				        	{
-				        		  this.siqlist.addtoRowList();   
+				        		  this.siqList.addtoRowList();   
 				        	}
 						  
 					  }
@@ -350,9 +350,9 @@ public class RESTInterface {
 		    	}
 		    	else
 		    	{
-		    		int position=this.siqlist.getColumnlist().indexOf(e.getKey());
+		    		int position=this.siqList.getColumnlist().indexOf(e.getKey());
 			    	if(position!=-1)
-			    	this.siqlist.addObj(e.getValue(),position);
+			    	this.siqList.addObj(e.getValue(),position);
 		    	}
 		    
 		      }

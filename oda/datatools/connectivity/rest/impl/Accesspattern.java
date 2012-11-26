@@ -2,48 +2,57 @@ package oda.datatools.connectivity.rest.impl;
 
 import java.util.Map;
 import java.util.Vector;
-
+/*
+ * This Class is used for the Following:
+ * 		This is the class from which user will be able to provide input to the ODA-rest Driver.
+ * 		1.queryString	->a Vector which consist of Queries at various levels.
+ * 		2.requestMethod	->a Vector which consist of an Enum which is either GET or POST for each level of request.
+ * 		3.requestParameters ->a Vector which consist of parameters which can be needed in the POST or GET requests on each level.
+ * 		4.dataMapping		->a Vector which consist of request and response mapping which is needed at each level.
+ * 		5.columnMapping		->a Vector which consist of columns which can be needed to be mapped from one level to another in case of naming by a particular case.
+ * 
+ */
 public class AccessPattern{
 
-	private Vector<String> query;
-	private Vector<RequestMethod> method;
-	private Vector<Map<String, Object>> param;
-	private Vector<Map<String, String>> datamappingstring;
-	private Vector<ColumnNameMapping> columnmappingstring;
+	private Vector<String> queryString;
+	private Vector<RequestMethod> requestMethod;
+	private Vector<Map<String, Object>> requestParameters;
+	private Vector<Map<String, String>> dataMapping;
+	private Vector<ColumnNameMapping> columnMapping;
 	
-	public Vector<String> getQuery() {
-		return query;
-	}
-	
-	public Vector<RequestMethod> getMethod() {
-		return method;
-	}
-	public Vector<Map<String, Object>> getParam() {
-		return param;
-	}
-	public Vector<Map<String, String>> getDatamappingstring() {
-		return datamappingstring;
+	public Vector<String> getQueryString() {
+		return queryString;
 	}
 	
-	public Vector<ColumnNameMapping> getColumnmappingstring() {
-		return columnmappingstring;
+	public Vector<RequestMethod> getRequestMethod() {
+		return requestMethod;
+	}
+	public Vector<Map<String, Object>> getRequestParameters() {
+		return requestParameters;
+	}
+	public Vector<Map<String, String>> getDataMapping() {
+		return dataMapping;
 	}
 	
-	public void setQuery(String query, RequestMethod method,DataMapping datamapping) {
-			this.query.add(query);
-			this.method.add(method);
-			this.param.add(datamapping.getParam());
-			this.datamappingstring.add(datamapping.getResponseRequestMapping());
-			this.columnmappingstring.add(datamapping.getColumnnamemapping());
+	public Vector<ColumnNameMapping> getColumnMapping() {
+		return columnMapping;
+	}
+	
+	public void setqueryString(String queryString, RequestMethod requestMethod,DataMapping datamapping) {
+			this.queryString.add(queryString);
+			this.requestMethod.add(requestMethod);
+			this.requestParameters.add(datamapping.getParameters());
+			this.dataMapping.add(datamapping.getResponseRequestMapping());
+			this.columnMapping.add(datamapping.getColumnNameMapping());
 		
 	}
 	public AccessPattern()
 	{
-		 query=new  Vector<String>();
-		 method=new Vector<RequestMethod>();
-		 param=new  Vector<Map<String, Object>>();
-		 datamappingstring=new Vector<Map<String, String>>();
-		 columnmappingstring=new Vector<ColumnNameMapping>();
+		 queryString=new  Vector<String>();
+		 requestMethod=new Vector<RequestMethod>();
+		 requestParameters=new  Vector<Map<String, Object>>();
+		 dataMapping=new Vector<Map<String, String>>();
+		 columnMapping=new Vector<ColumnNameMapping>();
 	}
 	
 	

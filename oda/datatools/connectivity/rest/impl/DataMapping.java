@@ -9,43 +9,46 @@ public class DataMapping {
 	 * @param args
 	 */
 	private Map<String,String> responseRequestMapping;
-	
-	private ColumnNameMapping columnnamemapping;
-	private Map<String, Object> param;
+	private ColumnNameMapping columnNameMapping;
+	private Map<String, Object> parameters;
 
-	public DataMapping()
-	{
-		responseRequestMapping=new HashMap<String,String>();
-		param=new HashMap<String,Object>();
-		
+	
+	public Map<String, String> getResponseRequestMapping() {
+		return responseRequestMapping;
+	}
+
+	public ColumnNameMapping getColumnNameMapping() {
+		return columnNameMapping;
+	}
+
+	public Map<String, Object> getParameters() {
+		return parameters;
 	}
 	
-	public void addColumnNameMapping(String sourcekey,String sourcevalue,String destinationkey)
-	{
-		columnnamemapping=new ColumnNameMapping();
-		columnnamemapping.setDestinationkey(destinationkey);
-		columnnamemapping.setSourcekey(sourcekey);
-		columnnamemapping.setSourcevalue(sourcevalue);
-	}
 	public void addRequestResponseMapping(String response_name,String request_name)
 	{
 		responseRequestMapping.put(response_name, request_name);
 	}
 	public void addParameter(String paramName,String paramValue)
 	{
-		param.put(paramName, paramValue);
+		parameters.put(paramName, paramValue);
 	}
-
 	
-	public ColumnNameMapping getColumnnamemapping() {
-		return columnnamemapping;
+	public DataMapping()
+	{
+		responseRequestMapping=new HashMap<String,String>();
+		parameters=new HashMap<String,Object>();
+		
 	}
-	public Map<String, String> getResponseRequestMapping() {
-		return responseRequestMapping;
+	
+	public void addColumnNameMapping(String sourcekey,String sourcevalue,String destinationkey)
+	{
+		columnNameMapping=new ColumnNameMapping();
+		columnNameMapping.setDestinationKey(destinationkey);
+		columnNameMapping.setSourceKey(sourcekey);
+		columnNameMapping.setSourceValue(sourcevalue);
 	}
-	public Map<String, Object> getParam() {
-		return param;
-	}
+	
 	
 
 	
