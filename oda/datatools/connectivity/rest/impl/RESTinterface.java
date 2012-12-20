@@ -45,8 +45,8 @@ public class RESTInterface {
 			Vector<Map<String, String>> dataMappingList) {
 		this.dataMappingList = dataMappingList;
 	}
-	
-	
+
+
 	public void setColumnMappingList(
 			Vector<ColumnNameMapping> columnMappingList) {
 		this.columnMappingList = columnMappingList;
@@ -61,7 +61,7 @@ public class RESTInterface {
 		response=null;
 		columnMapping=new HashMap<Object, Object>();
 		columnNameMapping=null;
-	
+
 	}
 	private int fillColumnMappings(String response,ColumnNameMapping columnNameMapping)
 	{    
@@ -74,7 +74,7 @@ public class RESTInterface {
 	        {
 	          jsonresourceobj = (JSONArray)e.getValue();
 	        }
-	        
+
 	      }
 	      for (int j = 0; j < jsonresourceobj.size(); j++)
 		  {
@@ -98,10 +98,10 @@ public class RESTInterface {
 	         {
 	            case GET:
 	             {
-	            
+
 					if(dataMapping!=null)
 					{
-					
+
 						for (Map.Entry<String, Object> entry : dataMapping.entrySet())
 						{
 							param.put(entry.getKey(),entry.getValue());
@@ -115,7 +115,7 @@ public class RESTInterface {
 					params.add(new NameValuePair("offset",String.valueOf(offset)));
 					params.add(new NameValuePair("limit",String.valueOf(limit)));
 					offset+=limit;
-					
+
 					try
 					{
 						response=restClient.ExecuteGet(params,query.get(position));
@@ -154,9 +154,9 @@ public class RESTInterface {
 							throw new OdaException("Data from the Client is not a jason object");
 						}
 						jsonlist.add(jb);
-					
+
 					}
-					
+
 					try
 					{
 						response=restClient.ExecutePost(jsonlist,query.get(position));
@@ -197,16 +197,16 @@ public class RESTInterface {
 				        {
 				          jsonresourceobj = (JSONArray)e.getValue();
 				        }
-				        
+
 				      }
-				   
+
 				      for (int j = 0; j < jsonresourceobj.size(); j++)
 					  {
 				    	    siqList.createRow();
 					        JSONObject obj1 = jsonresourceobj.getJSONObject(j);
 					        extraction(obj1.toString());  
 					        siqList.addtoRowList();
-					    
+
 					  }
 			      }
 				response=null;
@@ -214,19 +214,19 @@ public class RESTInterface {
 				{
 					limitReached=true;
 				}
-			
+
 				return siqList;
 			}
 			else
 			{
 				position++;
 			}
-			
+
 		}
-		
+
 		return siqList;
-		
-	
+
+
 	}
 	public RESTList getRESTlist() {
 		return siqList;
@@ -234,15 +234,18 @@ public class RESTInterface {
 	public void setRESTlist(RESTList siqList) {
 		this.siqList = siqList;
 	}
-	
+
 	public void extraction(String JSONString) {
 	    JSONObject jsonobj = JSONObject.fromObject(JSONString);
 	    Iterator i = jsonobj.entrySet().iterator();
 	    while (i.hasNext()) {
 	      Map.Entry e = (Map.Entry)i.next();
+	      
 	      if (e.getValue().getClass().getName() != "net.sf.json.JSONObject")
 	      {
-	    	    	for(int j=0;j<columnMappingList.size();j++)
+	    	  
+	    	        boolean check=false;
+	    	  		for(int j=0;j<columnMappingList.size();j++)
 	    	    	{
 	    	    		ColumnNameMapping columnNameMapping=columnMappingList.get(j);
 	    	    		if(columnNameMapping!=null)
@@ -251,28 +254,34 @@ public class RESTInterface {
 	    	    	    	if(position!=-1)
 	    	    	    	if(columnNameMapping.getDestinationKey().equals(e.getKey())&&columnMapping.get(e.getValue())!=null)
 	    	    	    	{
-	    	    	    		  
+
 	    	    			    	this.siqList.addObj(columnMapping.get(e.getValue()),position);
 	    	    	    	}
 	    	    	    	else
 	    	    	    	{
 	    	    	    			this.siqList.addObj(e.getValue(),position);
 	    	    	    	}
-	    	    		}
-    	    		    else
-    		    	    {
-    		    	    	int position=this.siqList.getColumnlist().indexOf(e.getKey());
-    		   		    	if(position!=-1)
-    		   		    	this.siqList.addObj(e.getValue(),position);
-    		    	    }
+	    	    	   }
+	    	    	   check=true;
+    	    		   
 	    	    	}
-	    	   
-	    	 
+	    	  		System.out.println("list"+this.siqList.getRow());
+	    	  		if(!check)
+		    	    {
+		    	    	int position=this.siqList.getColumnlist().indexOf(e.getKey());
+		   		    	if(position!=-1)
+		   		    	this.siqList.addObj(e.getValue(),position);
+		   		    	System.out.println("hi iam");
+		    	    }
+		    	    System.out.println("list"+this.siqList.getRow());
+	    	  		
+	    	  		
+
 	      }
-	    
+
 	    }
 	}
-	
+
 	/* 
 	 public void catalyst2(String obj1, int col,Object key,Object value) {
 	    JSONObject jsonobj = JSONObject.fromObject(obj1.toString());
@@ -359,5 +368,5 @@ public class RESTInterface {
 		    }
 		  }
 		  */
-	
+
 }

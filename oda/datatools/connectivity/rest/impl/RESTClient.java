@@ -185,6 +185,10 @@ public class RESTClient {
             conn.releaseConnection();
           
         } 
+        catch(HttpRetryException ex)
+        {
+        	throw new HttpRetryException();
+        }
         catch(ConnectionClosedException ex)
         {
         	throw new HttpRetryException();
@@ -203,17 +207,22 @@ public class RESTClient {
 	
     }
 
-    private static String convertStreamToString(InputStream is) throws OdaException {
+    private static String convertStreamToString(InputStream is) throws OdaException,HttpRetryException {
     	String message=null;
     	
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         try {
 			message= reader.readLine();
-		} catch (IOException e1) {
+		} catch(ConnectionClosedException e)
+        {
+          	throw new HttpRetryException();
+            
+        }catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			throw new OdaException("Error in Fetching the data");
 		}
+        
 		return message;
       
     }
