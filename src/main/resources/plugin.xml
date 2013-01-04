@@ -18,47 +18,47 @@
          <dataTypeMapping
                nativeDataTypeCode="1"
                odaScalarDataType="String"
-               nativeDataType="String">
+               nativeDataType="java.lang.String">
          </dataTypeMapping>
          <dataTypeMapping
                nativeDataTypeCode="4"
                odaScalarDataType="Integer"
-               nativeDataType="Integer">
+               nativeDataType="java.lang.Integer">
          </dataTypeMapping>
          <dataTypeMapping
                nativeDataTypeCode="8"
                odaScalarDataType="Double"
-               nativeDataType="Double">
+               nativeDataType="java.lang.Double">
          </dataTypeMapping>
          <dataTypeMapping
                nativeDataTypeCode="3"
                odaScalarDataType="Decimal"
-               nativeDataType="BigDecimal">
+               nativeDataType="java.math.BigDecimal">
          </dataTypeMapping>
          <dataTypeMapping
                nativeDataTypeCode="91"
                odaScalarDataType="Date"
-               nativeDataType="Date">
+               nativeDataType="java.lang.Date">
          </dataTypeMapping>
          <dataTypeMapping
                nativeDataTypeCode="92"
                odaScalarDataType="Time"
-               nativeDataType="Time">
+               nativeDataType="java.util.Time">
          </dataTypeMapping>
          <dataTypeMapping
                nativeDataTypeCode="93"
                odaScalarDataType="Timestamp"
-               nativeDataType="Timestamp">
+               nativeDataType="java.sql.Timestamp;">
          </dataTypeMapping>
          <dataTypeMapping
                nativeDataTypeCode="16"
                odaScalarDataType="Boolean"
-               nativeDataType="Boolean">
+               nativeDataType="java.lang.Boolean">
          </dataTypeMapping>
           <dataTypeMapping
                nativeDataTypeCode="11"
                odaScalarDataType="JavaObject"
-               nativeDataType="javaObject">
+               nativeDataType="java.lang.javaObject">
          </dataTypeMapping>
       </dataSet>
    </extension>

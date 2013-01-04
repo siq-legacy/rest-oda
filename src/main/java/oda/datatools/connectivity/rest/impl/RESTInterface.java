@@ -265,15 +265,12 @@ public class RESTInterface {
 	    	    	   check=true;
     	    		   
 	    	    	}
-	    	  		System.out.println("list"+this.siqList.getRow());
 	    	  		if(!check)
 		    	    {
 		    	    	int position=this.siqList.getColumnlist().indexOf(e.getKey());
 		   		    	if(position!=-1)
 		   		    	this.siqList.addObj(e.getValue(),position);
-		   		    	System.out.println("hi iam");
 		    	    }
-		    	    System.out.println("list"+this.siqList.getRow());
 	    	  		
 	    	  		
 

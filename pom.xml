@@ -1,0 +1,156 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>oda.datatools.connectivity.rest.siq</groupId>
+  <artifactId>rest-oda</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>REST ODA Driver</name>
+  <description>This Driver is used for the Open DataBase Connectivity for REST API</description>
+   <distributionManagement>
+	  <repository>
+    	<id>releases</id>
+    	<url>http://nexus.storediq.com:8081/nexus/content/repositories/releases</url>
+  	  </repository>
+     <snapshotRepository>
+    	<id>snapshots</id>
+    	<url>http://nexus.storediq.com:8081/nexus/content/repositories/snapshots</url>
+  </snapshotRepository>
+  </distributionManagement>
+   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+       
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+         
+        <executions>
+          <execution>
+            <phase>install</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+       
+        <executions>
+          <execution>
+            <phase>deploy</phase>
+            <goals>
+              <goal>deploy-file</goal>
+            </goals>
+            <configuration>
+              <file>target/${project.artifactId}-${project.version}.jar</file>
+              <url>${project.distributionManagement.repository.url}</url>
+              <packaging>jar</packaging>
+              <artifactId>${project.artifactId}</artifactId>
+              <groupId>${project.groupId}</groupId>
+              <version>1.0</version>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      </plugins>
+      </build>
+  <dependencies>
+		   <dependency>
+  <groupId>org.apache.commons</groupId>
+  <artifactId>beanutils</artifactId>
+  <version>1.8.0</version>
+</dependency>
+<dependency>
+  <groupId>org.apache.commons</groupId>
+  <artifactId>collections</artifactId>
+  <version>3.2</version>
+</dependency>
+<dependency>
+  <groupId>org.apache.commons</groupId>
+  <artifactId>httpclient</artifactId>
+  <version>3.1</version>
+</dependency>
+<dependency>
+  <groupId>org.apache.commons</groupId>
+  <artifactId>lang</artifactId>
+  <version>2.3</version>
+</dependency>
+<dependency>
+  <groupId>org.apache.commons</groupId>
+  <artifactId>logging-api</artifactId>
+  <version>1.1</version>
+</dependency>
+<dependency>
+  <groupId>org.apache.http</groupId>
+  <artifactId>client</artifactId>
+  <version>4.2.2</version>
+</dependency>
+<dependency>
+  <groupId>org.apache.http</groupId>
+  <artifactId>core</artifactId>
+  <version>4.2.2</version>
+</dependency>
+<dependency>
+  <groupId>net.sf</groupId>
+  <artifactId>ezmorph</artifactId>
+  <version>1.0</version>
+</dependency>
+<dependency>
+  <groupId>net.sf</groupId>
+  <artifactId>json</artifactId>
+  <version>2.1</version>
+ 
+</dependency>
+<dependency>
+  <groupId>org.eclipse</groupId>
+  <artifactId>core</artifactId>
+  <version>2346</version>
+</dependency>
+<dependency>
+  <groupId>org.eclipse.datatools.connectivity</groupId>
+  <artifactId>oda</artifactId>
+  <version>3.3.3</version>
+</dependency>
+<dependency>
+  <groupId>org.eclipse.equinox</groupId>
+  <artifactId>common</artifactId>
+  <version>1841</version>
+</dependency>
+<dependency>
+  <groupId>org.eclipse.equinox</groupId>
+  <artifactId>registry</artifactId>
+  <version>1841</version>
+</dependency>
+<dependency>
+  <groupId>org.eclipse</groupId>
+  <artifactId>jface</artifactId>
+  <version>083647</version>
+</dependency>
+<dependency>
+  <groupId>org.eclipse</groupId>
+  <artifactId>osgi</artifactId>
+  <version>144521</version>
+</dependency>
+<dependency>
+  <groupId>org.eclipse.ui</groupId>
+  <artifactId>workbench</artifactId>
+  <version>120042</version>
+</dependency>
+<dependency>
+  <groupId>com.storediq</groupId>
+  <artifactId>siq_columns</artifactId>
+  <version>1.0</version>
+</dependency>
+<dependency>
+   <groupId>com.ibm</groupId>
+  <artifactId>icu</artifactId>
+  <version>1.0</version>
+</dependency>
+
+  </dependencies>
+</project>
