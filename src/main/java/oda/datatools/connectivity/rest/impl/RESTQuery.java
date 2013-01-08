@@ -1,5 +1,4 @@
 package oda.datatools.connectivity.rest.impl;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
@@ -8,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
@@ -30,6 +30,7 @@ public class RESTQuery
   private Map<String,Object>  parameterNames;
   private RESTInterface restInterface;
   private AccessPattern accessPattern;
+  private RESTColumnsExtract columnsextract;
  
   public RESTQuery()
   {
@@ -65,12 +66,13 @@ public class RESTQuery
     throws OdaException
   {
     this.logger.finest("EXECUTE QUERY");
+    //till now one instance of accesspattern is supported
+ 
 	parameterMetaData=new RESTParameterMetaData(this.paramPositions);
 	restInterface.prepare();
 	restInterface.setRESTlist(restList);
-    IResultSet  resultSet= new RESTResultSet(restInterface,this.resultsetMetaData);
+    IResultSet  resultSet= new RESTResultSet(restInterface,resultsetMetaData);
     resultSet.setMaxRows(getMaxRows());
-    
     return resultSet;
   }
 
@@ -119,40 +121,17 @@ public class RESTQuery
 	
     return null;
   }
-  @SuppressWarnings("unchecked")
-public void prepare(String queryText)
+  public void prepare(String queryText)
     throws OdaException
   {
+	 this.restList=new RESTList();
 	 this.queryText=queryText;
-	 int last_track=queryText.lastIndexOf('/');
-	 CharSequence sequence=queryText.subSequence(last_track+1, queryText.length());
-	 List<Class<?>> types;
+	 List<String> types;
 	 List<String> names;
-	 try
-	 {
-		 Class<?> cls = Class.forName("siqcolumns.Siqcolumns");
-		 Object obj = cls.newInstance();
-		 Class<?> noparams[] = {};
-		 Method columnstype = cls.getDeclaredMethod(sequence.toString()+"Columns", noparams);
-		 columnstype.invoke(obj, null);
-		 Method columns_names = cls.getDeclaredMethod("getColumns", noparams);
-	
-		 names=(List<String>) columns_names.invoke(obj, null);
-		 Method columns_types = cls.getDeclaredMethod("getDatatype", noparams);
-		
-		 types=(List<Class<?>>) columns_types.invoke(obj, null);
-	 }
-	 catch(Exception ex)
-	 {
-		 ex.printStackTrace();
-		 throw new OdaException("Exception in the prepare Query");
-		 
-	 }
-	 
-	 this.restList = new RESTList();
-	 this.restList.setColumnlist(names);
-	 this.restList.setDatatype(types);
-	 resultsetMetaData=new RESTResultSetMetaData(this.restList);
+	 columnsextract=new RESTColumnsExtract(restList);
+	 columnsextract.extract(this.queryText);
+	 resultsetMetaData=new RESTResultSetMetaData(restList);
+	 resultsetMetaData.setColumns();
   }
 
   public void setAppContext(Object context)

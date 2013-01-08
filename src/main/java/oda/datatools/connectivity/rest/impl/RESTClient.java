@@ -31,7 +31,7 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 
-public class RESTClient {
+public class RESTClient implements RESTConstants {
     private int responseCode;
     private String message;
     private String response;
@@ -39,7 +39,6 @@ public class RESTClient {
     private HttpClient client;
     private HttpHost host;
     private HttpRoute route;
-    private final int HTTP_PARTIAL=206;
     private int hitcounts;
     public String getResponse() {
         return response;
@@ -60,7 +59,7 @@ public class RESTClient {
     {
     		HttpResponse response;
             String combinedParams = "";
-            if(!params.isEmpty()){
+            if(params!=null &&!params.isEmpty()){
                 combinedParams += "?";
                 
                 for(NameValuePair p : params)
@@ -84,10 +83,10 @@ public class RESTClient {
            route = new HttpRoute(host); 
      
            response=executeRequest(request);
-           while(response.getStatusLine().getStatusCode()==this.HTTP_PARTIAL)
+           while(response.getStatusLine().getStatusCode()==HTTP_PARTIAL)
            {
 	        	this.hitcounts+=1;
-	        	if(hitcounts==500)
+	        	if(hitcounts==10)
 	        	{
 	        		 throw new OdaException("Error in Data  from Server");
 	        	}
@@ -131,10 +130,10 @@ public class RESTClient {
             route = new HttpRoute(host); 
             
             response=executeRequest(request);
-            while(response.getStatusLine().getStatusCode()==this.HTTP_PARTIAL)
+            while(response.getStatusLine().getStatusCode()==HTTP_PARTIAL)
             {
             	this.hitcounts+=1;
-	        	if(hitcounts==500)
+	        	if(hitcounts==10)
 	        	{
 	        		 throw new OdaException("Error in Data  from Server");
 	        	}
@@ -176,7 +175,7 @@ public class RESTClient {
             HttpEntity entity = httpResponse.getEntity();
             
             
-            if (entity != null&&responseCode!=this.HTTP_PARTIAL) {
+            if (entity != null&&responseCode!=HTTP_PARTIAL) {
                 InputStream instream = entity.getContent();
                 response = convertStreamToString(instream);
                 instream.close();        

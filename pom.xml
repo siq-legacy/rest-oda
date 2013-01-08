@@ -142,11 +142,6 @@
   <version>120042</version>
 </dependency>
 <dependency>
-  <groupId>com.storediq</groupId>
-  <artifactId>siq_columns</artifactId>
-  <version>1.0</version>
-</dependency>
-<dependency>
    <groupId>com.ibm</groupId>
   <artifactId>icu</artifactId>
   <version>1.0</version>

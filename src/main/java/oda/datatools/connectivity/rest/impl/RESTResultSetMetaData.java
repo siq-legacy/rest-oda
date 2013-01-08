@@ -13,13 +13,18 @@ public class RESTResultSetMetaData
   protected static Logger logger = Logger.getLogger(RESTResultSetMetaData.class.getName());
   private RESTList siqlist;
 
-  public RESTResultSetMetaData(RESTList siqlistentries)
-  {
-	  this.siqlist = siqlistentries;
-	    for (String tag : siqlistentries.getColumnlist())
-	      this.colHeaders.add(tag);
-  }
 
+
+public RESTResultSetMetaData(RESTList siqlist)
+  {
+	this.siqlist = siqlist;
+    for (String tag : this.siqlist.getColumnlist())
+      this.colHeaders.add(tag);
+  }
+public void setColumns()
+{
+	
+}
   public int getColumnCount() throws OdaException
   {
     return this.colHeaders.size();
@@ -43,39 +48,18 @@ public class RESTResultSetMetaData
     return (String)this.colHeaders.get(index - 1);
   }
 
-  public String getdatatype(int index)
-  {
-    List<Class<?>> siqdatatype = this.siqlist.getDatatype();
-    Class<?> cls = (Class<?>)siqdatatype.get(index-1);
- 
-    return cls.getName();
-   
-  }
   public int getColumnType(int index)
     throws OdaException
   {
-	  DataSetType typeMapping[] = RESTDriver.getManifest().getDataSetTypes();
-		for(int i=0;i<typeMapping.length;i++)
-		{
-			DataTypeMapping typemap[]=typeMapping[i].getDataTypeMappings();
-			for(int j=0;j<typemap.length;j++)
-			{
-				if(getdatatype(index).equals(typemap[j].getNativeType()))
-				{
-					return typemap[j].getNativeTypeCode();
-				}
-				
-			}
-		
-		}
-		return 1;
-   
+	  return  RESTDriver.getManifest().getDataSetType(RESTDriver.ODA_DATA_SET_ID).getDataTypeMapping(this.siqlist.getDatatype().get(index-1)).getOdaScalarDataTypeCode();
+	  
   }
 
   public String getColumnTypeName(int index)
     throws OdaException
   {
-	return getdatatype(index);
+	
+	return RESTDriver.getManifest().getDataSetType(RESTDriver.ODA_DATA_SET_ID).getDataTypeMapping(this.siqlist.getDatatype().get(index-1)).getOdaScalarDataType();
 
   }
 

@@ -17,7 +17,6 @@ public class RESTParameterMetaData
 
   public int getParameterCount() throws OdaException
   {
-	  System.out.println("getParameterCount Name"+this.parametercount);
     return this.parametercount;
   }
 

@@ -9,9 +9,9 @@ import org.eclipse.datatools.connectivity.oda.util.manifest.ExtensionManifest;
 import org.eclipse.datatools.connectivity.oda.util.manifest.ManifestExplorer;
 
 public class RESTDriver
-  implements IDriver
+  implements IDriver,RESTConstants
 {
-  static String ODA_DATA_SOURCE_ID = "oda.datatools.connectivity.rest";
+ 
 
   public IConnection getConnection(String arg0) throws OdaException
   {
@@ -41,7 +41,7 @@ public class RESTDriver
   }
 
   static String getNativeDataTypeName(int nativeDataTypeCode) throws OdaException {
-    DataTypeMapping typeMapping = getManifest().getDataSetType(null)
+    DataTypeMapping typeMapping = getManifest().getDataSetType(ODA_DATA_SET_ID)
       .getDataTypeMapping(nativeDataTypeCode);
     if (typeMapping != null)
       return typeMapping.getNativeType();

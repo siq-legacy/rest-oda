@@ -12,8 +12,8 @@ public class RESTList
 	this.columnList = columnList;
 }
 
-  private List<Class<?>> datatype;
-  public void setDatatype(List<Class<?>> datatype) {
+  private List<String> datatype;
+  public void setDatatype(List<String> datatype) {
 	this.datatype = datatype;
 }
 
@@ -24,7 +24,7 @@ private List<Object> row;
 
 private List<List<Object>> rowList;
 
-  public List<Class<?>> getDatatype()
+  public List<String> getDatatype()
   {
     return this.datatype;
   }
@@ -41,9 +41,7 @@ private List<List<Object>> rowList;
     
   }
 
-  public void addDatatype(Class<?> clas) {
-    this.datatype.add(clas);
-  }
+ 
 
   
   public void addObj(Object obj,int position) {

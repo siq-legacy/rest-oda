@@ -254,15 +254,17 @@ public class RESTInterface {
 	    	    	    	if(position!=-1)
 	    	    	    	if(columnNameMapping.getDestinationKey().equals(e.getKey())&&columnMapping.get(e.getValue())!=null)
 	    	    	    	{
-
+	    	    	    			position=this.siqList.getColumnlist().indexOf(columnNameMapping.getSourceValue());
 	    	    			    	this.siqList.addObj(columnMapping.get(e.getValue()),position);
+	    	    	
 	    	    	    	}
 	    	    	    	else
 	    	    	    	{
 	    	    	    			this.siqList.addObj(e.getValue(),position);
 	    	    	    	}
+	    	    	    	check=true;
 	    	    	   }
-	    	    	   check=true;
+	    	    	 
     	    		   
 	    	    	}
 	    	  		if(!check)

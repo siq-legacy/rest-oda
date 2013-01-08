@@ -69,7 +69,7 @@ public class RESTConnection
   {
   }
 
-
+@Override
 public IQuery newQuery(String dataSetType) throws OdaException {
 
 	 IQuery aQuery = (IQuery)this.queryMap.get(dataSetType);
