@@ -1,4 +1,4 @@
-package oda.datatools.connectivity.rest.impl;
+package oda.datatools.connectivity.rest.siq.impl;
 
 import org.eclipse.datatools.connectivity.oda.IConnection;
 import org.eclipse.datatools.connectivity.oda.IDriver;

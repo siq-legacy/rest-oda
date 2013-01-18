@@ -1,4 +1,4 @@
-package oda.datatools.connectivity.rest.impl;
+package oda.datatools.connectivity.rest.siq.impl;
 
 import java.util.Map;
 import java.util.Vector;
@@ -14,15 +14,12 @@ import java.util.Vector;
  */
 public class AccessPattern{
 
-	private Vector<String> queryString;
 	private Vector<RequestMethod> requestMethod;
 	private Vector<Map<String, Object>> requestParameters;
 	private Vector<Map<String, String>> dataMapping;
 	private Vector<ColumnNameMapping> columnMapping;
 	
-	public Vector<String> getQueryString() {
-		return queryString;
-	}
+	
 	
 	public Vector<RequestMethod> getRequestMethod() {
 		return requestMethod;
@@ -38,8 +35,7 @@ public class AccessPattern{
 		return columnMapping;
 	}
 	
-	public void setqueryString(String queryString, RequestMethod requestMethod,DataMapping datamapping) {
-			this.queryString.add(queryString);
+	public void setqueryString(RequestMethod requestMethod,DataMapping datamapping) {
 			this.requestMethod.add(requestMethod);
 			this.requestParameters.add(datamapping.getParameters());
 			this.dataMapping.add(datamapping.getResponseRequestMapping());
@@ -48,7 +44,6 @@ public class AccessPattern{
 	}
 	public AccessPattern()
 	{
-		 queryString=new  Vector<String>();
 		 requestMethod=new Vector<RequestMethod>();
 		 requestParameters=new  Vector<Map<String, Object>>();
 		 dataMapping=new Vector<Map<String, String>>();

@@ -1,4 +1,4 @@
-package oda.datatools.connectivity.rest.impl;
+package oda.datatools.connectivity.rest.siq.impl;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,7 +45,6 @@ public class RESTColumnsExtract implements RESTConstants {
 		
 		 for(int i=0;i<url.length;i++)
 		 {
-			 System.out.println(url[i]);
 			 int last_track=url[i].lastIndexOf('/');
 			 
 			 CharSequence sequence=url[i].subSequence(0,last_track);

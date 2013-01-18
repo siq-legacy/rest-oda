@@ -1,4 +1,4 @@
-package oda.datatools.connectivity.rest.impl;
+package oda.datatools.connectivity.rest.siq.impl;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -17,7 +17,7 @@ import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 
 public class RESTResultSet
-  implements IResultSet
+  implements IResultSet,RESTConstants
 {
   private int m_maxRows;
   private int m_currentRowId;
@@ -26,13 +26,16 @@ public class RESTResultSet
   private List<Object> currentRow;
   private RESTResultSetMetaData resultSetMetaData;
   private RESTInterface searchRequest;
+  private String datasettype;
   
-  
-  public RESTResultSet(RESTInterface searchRequest,RESTResultSetMetaData resultSetMetaData) throws OdaException
+  public RESTResultSet(RESTInterface searchRequest,RESTResultSetMetaData resultSetMetaData,String argdatasettype) throws OdaException
   {
     this.resultSetMetaData = resultSetMetaData;
     this.searchRequest=searchRequest;
-    setQuery();
+    this.datasettype=argdatasettype;
+    System.out.println("the dataset"+argdatasettype);
+    if(!datasettype.equals(ODA_DATA_SET_UI_ID))
+    	setQuery();
   }
 
   public void close() throws OdaException
@@ -216,7 +219,7 @@ public class RESTResultSet
 		  return null;
 	  else
 	  {
-		  return (String)this.currentRow.get(index-1);
+		  return this.currentRow.get(index-1).toString();
 	  }
    
   }
@@ -297,7 +300,7 @@ public class RESTResultSet
   public void setQuery() throws OdaException
   {
 		
-	  
+	    System.out.println(" in search");
 	    this.rows = this.searchRequest.executeQuery().getRows();
 	    this.rowIter = this.rows.listIterator();
 	    this.setMaxRows(this.rows.size());
@@ -320,7 +323,9 @@ public class RESTResultSet
   public boolean next()
     throws OdaException
   {
-
+	if(datasettype.equals(ODA_DATA_SET_UI_ID))
+		return false;
+	
     if (check())
     {
     	return true;

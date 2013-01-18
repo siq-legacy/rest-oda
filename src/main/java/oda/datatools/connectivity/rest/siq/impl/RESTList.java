@@ -1,4 +1,4 @@
-package oda.datatools.connectivity.rest.impl;
+package oda.datatools.connectivity.rest.siq.impl;
 
 import java.util.Arrays;
 import java.util.LinkedList;

@@ -1,4 +1,4 @@
-package oda.datatools.connectivity.rest.impl;
+package oda.datatools.connectivity.rest.siq.impl;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
@@ -31,25 +32,19 @@ public class RESTQuery
   private RESTInterface restInterface;
   private AccessPattern accessPattern;
   private RESTColumnsExtract columnsextract;
- 
-  public RESTQuery()
+  private String datasettype;
+  public RESTQuery(String argdatasettype)
   {
 	  paramPositions=new  HashMap<Integer,Object>();
 	  parameterNames=new  HashMap<String,Object>();
 	  restInterface=new RESTInterface();
+	  datasettype=argdatasettype;
+	  
   }
   public void cancel()
     throws OdaException, UnsupportedOperationException
   {
   }
-  
-//this is for testing purpose
- /* private void testsiq(String methodName) throws OdaException
-  {
-    if ((this.restList == null) || (this.restList.getRows() == null) || (this.restList.getRows().size() == 0))
-      throw new OdaException("Data Feed is null or empty in " + methodName);
-  }
-*/
   public void clearInParameters() throws OdaException
   {
     this.logger.finest("ClearInParameters");
@@ -67,11 +62,11 @@ public class RESTQuery
   {
     this.logger.finest("EXECUTE QUERY");
     //till now one instance of accesspattern is supported
- 
+    System.out.println("the execute query");
 	parameterMetaData=new RESTParameterMetaData(this.paramPositions);
 	restInterface.prepare();
 	restInterface.setRESTlist(restList);
-    IResultSet  resultSet= new RESTResultSet(restInterface,resultsetMetaData);
+    IResultSet  resultSet= new RESTResultSet(restInterface,resultsetMetaData,datasettype);
     resultSet.setMaxRows(getMaxRows());
     return resultSet;
   }
@@ -126,8 +121,9 @@ public class RESTQuery
   {
 	 this.restList=new RESTList();
 	 this.queryText=queryText;
-	 List<String> types;
-	 List<String> names;
+	 System.out.println("the querytext "+queryText);
+	 String[] queryarray=queryText.split(";");
+	 restInterface.setQuery(queryarray);
 	 columnsextract=new RESTColumnsExtract(restList);
 	 columnsextract.extract(this.queryText);
 	 resultsetMetaData=new RESTResultSetMetaData(restList);
@@ -226,7 +222,6 @@ public class RESTQuery
 	  restInterface.setDataMappingList(accessPattern.getDataMapping());
 	  restInterface.setRequestMethodList(accessPattern.getRequestMethod());
 	  restInterface.setParameterList(accessPattern.getRequestParameters());
-	  restInterface.setQuery(accessPattern.getQueryString());
 	  restInterface.setColumnMappingList(accessPattern.getColumnMapping());
 	  
   }
@@ -239,7 +234,6 @@ public class RESTQuery
 	  restInterface.setDataMappingList(accessPattern.getDataMapping());
 	  restInterface.setRequestMethodList(accessPattern.getRequestMethod());
 	  restInterface.setParameterList(accessPattern.getRequestParameters());
-	  restInterface.setQuery(accessPattern.getQueryString());
 	  restInterface.setColumnMappingList(accessPattern.getColumnMapping());
 	  
   }

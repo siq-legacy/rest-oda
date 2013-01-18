@@ -1,4 +1,4 @@
-package oda.datatools.connectivity.rest.impl;
+package oda.datatools.connectivity.rest.siq.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,7 +40,16 @@ public class RESTClient implements RESTConstants {
     private HttpHost host;
     private HttpRoute route;
     private int hitcounts;
-    public String getResponse() {
+    private String url;
+    public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getResponse() {
         return response;
     }
 
@@ -78,6 +87,8 @@ public class RESTClient implements RESTConstants {
   
            String s=combinedParams.toString();
            String thePath=url+s; 
+           this.setUrl(thePath);
+           System.out.println("the path"+thePath);
            HttpGet request = new HttpGet(thePath);    	
            host = new HttpHost(request.getURI().getPath());
            route = new HttpRoute(host); 

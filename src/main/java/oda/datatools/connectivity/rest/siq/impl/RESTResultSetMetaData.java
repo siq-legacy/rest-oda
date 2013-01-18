@@ -1,4 +1,4 @@
-package oda.datatools.connectivity.rest.impl;
+package oda.datatools.connectivity.rest.siq.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;

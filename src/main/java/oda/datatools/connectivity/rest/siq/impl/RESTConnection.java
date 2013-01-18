@@ -1,4 +1,4 @@
-package oda.datatools.connectivity.rest.impl;
+package oda.datatools.connectivity.rest.siq.impl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -38,6 +38,7 @@ public class RESTConnection
   public IDataSetMetaData getMetaData(String datasettype)
     throws OdaException
   {
+	  System.out.println("db"+datasettype);
     return new RESTDataSetMetaData(this);
   }
 
@@ -69,14 +70,15 @@ public class RESTConnection
   {
   }
 
-@Override
 public IQuery newQuery(String dataSetType) throws OdaException {
-
-	 IQuery aQuery = (IQuery)this.queryMap.get(dataSetType);
+	System.out.println(" the Iquery"+dataSetType);
+	 IQuery aQuery =this.queryMap.get(dataSetType);
+	 
 	    if (aQuery != null) {
+	     
 	      return aQuery;
 	    }
-	    aQuery = new RESTQuery();
+	    aQuery = new RESTQuery(dataSetType);
 	    this.queryMap.put(dataSetType, aQuery);
 
 	    return aQuery;

@@ -1,4 +1,4 @@
-package oda.datatools.connectivity.rest.impl;
+package oda.datatools.connectivity.rest.siq.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import org.eclipse.datatools.connectivity.oda.OdaException;
 
 public class RESTInterface {
 
-	private Vector<String> query;
+	private String[]  query;
 	private Vector<RequestMethod> requestMethodList;
 	private Vector<Map<String, Object>> parameterList;
 	private Vector<Map<String, String>> dataMappingList;
@@ -32,7 +32,7 @@ public class RESTInterface {
 	private boolean limitReached;
 	private ColumnNameMapping columnNameMapping;
 
-	public void setQuery(Vector<String> query) {
+	public void setQuery(String[] query) {
 		this.query = query;
 	}
 	public void setRequestMethodList(Vector<RequestMethod> requestMethodList) {
@@ -90,7 +90,7 @@ public class RESTInterface {
 			this.siqList.reset();
 			return this.siqList;
 		}
-		while(position<query.size())
+		while(position<query.length)
 		{
 			RequestMethod method=requestMethodList.get(position);
 			Map<String, Object> param=parameterList.get(position);
@@ -115,16 +115,18 @@ public class RESTInterface {
 					params.add(new NameValuePair("offset",String.valueOf(offset)));
 					params.add(new NameValuePair("limit",String.valueOf(limit)));
 					offset+=limit;
-
+					
 					try
 					{
-						response=restClient.ExecuteGet(params,query.get(position));
+						response=restClient.ExecuteGet(params,query[position]);
+						
 					}
 					catch(Exception ex)
 					{
 						ex.printStackTrace();
 						throw new OdaException("Data from the Server has Exception");
 					}
+					System.out.println("the response"+response);
 					columnNameMapping=columnMappingList.get(position);
 					if(columnNameMapping!=null)
 					{
@@ -159,7 +161,7 @@ public class RESTInterface {
 
 					try
 					{
-						response=restClient.ExecutePost(jsonlist,query.get(position));
+						response=restClient.ExecutePost(jsonlist,query[position]);
 					}
 					catch(Exception ex)
 					{
@@ -184,7 +186,7 @@ public class RESTInterface {
 					break;
 		       }
 	         }
-			if(position==query.size()-1)
+			if(position==query.length-1)
 			{
 				if (response != null)
 			    {
@@ -210,11 +212,13 @@ public class RESTInterface {
 					  }
 			      }
 				response=null;
+				System.out.println("the siqlist"+siqList.getRow());
 				if(siqList.getRows().size()<500)
 				{
 					limitReached=true;
 				}
-
+			
+				position=0;
 				return siqList;
 			}
 			else
@@ -223,7 +227,7 @@ public class RESTInterface {
 			}
 
 		}
-
+		
 		return siqList;
 
 
