@@ -6,7 +6,7 @@
          id="%oda.data.source.id"
          point="org.eclipse.datatools.connectivity.oda.dataSource">
       <dataSource
-            driverClass="oda.datatools.connectivity.rest.impl.RESTDriver"
+            driverClass="oda.datatools.connectivity.rest.siq.impl.RESTDriver"
             defaultDisplayName="%data.source.name"
             setThreadContextClassLoader="false"
             odaVersion="3.2"
