@@ -10,11 +10,11 @@
             defaultDisplayName="%data.source.name"
             setThreadContextClassLoader="false"
             odaVersion="3.2"
-            id="oda.datatools.connectivity.rest">
+            id="oda.datatools.connectivity.rest.siq">
       </dataSource>
       <dataSet
             defaultDisplayName="%data.set.name"
-            id="oda.datatools.connectivity.rest.dataSet">
+            id="oda.datatools.connectivity.rest.siq.dataSet">
          <dataTypeMapping
                nativeDataTypeCode="1"
                odaScalarDataType="String"
