@@ -21,10 +21,6 @@ public RESTResultSetMetaData(RESTList siqlist)
     for (String tag : this.siqlist.getColumnlist())
       this.colHeaders.add(tag);
   }
-public void setColumns()
-{
-	
-}
   public int getColumnCount() throws OdaException
   {
     return this.colHeaders.size();

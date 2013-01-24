@@ -33,8 +33,8 @@ public class RESTResultSet
     this.resultSetMetaData = resultSetMetaData;
     this.searchRequest=searchRequest;
     this.datasettype=argdatasettype;
-    System.out.println("the dataset"+argdatasettype);
-    if(!datasettype.equals(ODA_DATA_SET_UI_ID))
+   
+    if(!argdatasettype.equals(ODA_DATA_SET_UI_ID))
     	setQuery();
   }
 

@@ -8,11 +8,17 @@ import org.eclipse.datatools.connectivity.oda.OdaException;
 public class RESTDataSetMetaData
   implements IDataSetMetaData
 {
-  private IConnection m_connection;
+  private String datasettype;
+  public String getDatasettype() {
+	return datasettype;
+}
 
-  public RESTDataSetMetaData(IConnection connection)
+private IConnection m_connection;
+
+  public RESTDataSetMetaData(IConnection connection,String datasettype)
   {
     this.m_connection = connection;
+    this.datasettype=datasettype;
   }
 
   public IConnection getConnection()

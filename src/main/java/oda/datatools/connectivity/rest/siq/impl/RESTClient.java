@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,6 +21,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
@@ -64,6 +69,37 @@ public class RESTClient implements RESTConstants {
     {
     	hitcounts=0;
     }
+    public boolean  ExecuteHEAD(String url,String Username,String Password) throws Exception
+    {
+    	   HttpResponse response;
+           this.setUrl(url);
+         
+        
+           
+           HttpHead request=new HttpHead(url);
+           request.setHeader("Accept", "application/json, text/javascript, */*; q=0.01");
+           request.setHeader("Content-Type", "application/json");
+           
+           request.setHeader("X-SPIRE-CREDENTIAL-TYPE", "password");
+           request.setHeader("X-SPIRE-CREDENTIAL-USERNAME", Username);
+           request.setHeader("X-SPIRE-CREDENTIAL-PASSWORD", Password);
+           request.setHeader("X-Requested-With", "XMLHttpRequest");
+           request.setHeader("X-SPIRE-CREDENTIAL-TENANT-ID", "bastion.security");
+           
+           host = new HttpHost(request.getURI().getPath());
+           route = new HttpRoute(host); 
+           
+           response=executeRequest(request);
+        
+           if(response.getStatusLine().getStatusCode()==HTTP_OK)
+           {
+        	   request.abort();
+        	   return true;
+           }
+		return false;
+        
+           
+    }
     public String  ExecuteGet(ArrayList <NameValuePair> params,String url) throws Exception
     {
     		HttpResponse response;
@@ -88,7 +124,7 @@ public class RESTClient implements RESTConstants {
            String s=combinedParams.toString();
            String thePath=url+s; 
            this.setUrl(thePath);
-           System.out.println("the path"+thePath);
+        
            HttpGet request = new HttpGet(thePath);    	
            host = new HttpHost(request.getURI().getPath());
            route = new HttpRoute(host); 
@@ -165,7 +201,27 @@ public class RESTClient implements RESTConstants {
     
     private HttpResponse executeRequest(HttpUriRequest request) throws OdaException,HttpRetryException
     {
-     	client =RESTHttpClientFactory.getThreadSafeClient();
+     	try {
+			client =RESTHttpClientFactory.getThreadSafeClient();
+		} catch (KeyManagementException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			throw new OdaException("KeyManagementException "+ e1.getMessage());
+			
+		} catch (UnrecoverableKeyException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			throw new OdaException("UnrecoverableKeyException "+ e1.getMessage());
+		} catch (NoSuchAlgorithmException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			throw new OdaException("NoSuchAlgorithmException "+ e1.getMessage());
+		} catch (KeyStoreException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			throw new OdaException("KeyStoreException "+ e1.getMessage());
+		}
+     	
      	ManagedClientConnection conn = null;
         httpResponse=null;
         try {
@@ -185,7 +241,7 @@ public class RESTClient implements RESTConstants {
 			}
             HttpEntity entity = httpResponse.getEntity();
             
-            
+            System.out.println("the response"+responseCode);
             if (entity != null&&responseCode!=HTTP_PARTIAL) {
                 InputStream instream = entity.getContent();
                 response = convertStreamToString(instream);

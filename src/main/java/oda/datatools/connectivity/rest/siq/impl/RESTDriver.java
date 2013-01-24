@@ -19,6 +19,11 @@ public class RESTDriver
     return new RESTConnection();
   }
 
+  public RESTConnection getRestConnection(String arg0) throws OdaException
+  {
+    System.out.println("i got inside REST driver");
+    return new RESTConnection();
+  }
   public int getMaxConnections()
     throws OdaException
   {
@@ -35,7 +40,7 @@ public class RESTDriver
   {
   }
 
-  static ExtensionManifest getManifest() throws OdaException
+  public static ExtensionManifest getManifest() throws OdaException
   {
     return ManifestExplorer.getInstance().getExtensionManifest(ODA_DATA_SOURCE_ID);
   }

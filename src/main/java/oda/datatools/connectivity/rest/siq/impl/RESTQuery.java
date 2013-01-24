@@ -3,12 +3,13 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
-
+import oda.datatools.connectivity.rest.siq.impl.RESTConstants;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
@@ -24,16 +25,33 @@ public class RESTQuery
   private int m_maxRows;
   private String queryText;
   protected Logger logger = Logger.getLogger(RESTQuery.class.getName());
-  private RESTList restList;
-  private RESTResultSetMetaData resultsetMetaData;
-  private RESTParameterMetaData parameterMetaData;
+
+
+private RESTResultSetMetaData resultsetMetaData;
+  public void setResultsetMetaData(RESTResultSetMetaData resultsetMetaData) {
+	this.resultsetMetaData = resultsetMetaData;
+}
+
+private RESTParameterMetaData parameterMetaData;
   private Map<Integer, Object> paramPositions;
   private Map<String,Object>  parameterNames;
   private RESTInterface restInterface;
   private AccessPattern accessPattern;
   private RESTColumnsExtract columnsextract;
   private String datasettype;
-  public RESTQuery(String argdatasettype)
+  private HashMap<String,HashMap<String,String>> resources;
+  private HashMap<String,HashMap<String,String>> columnmapping;
+  private HashMap<String,List<String>> versions;
+  private RESTList restList;
+  
+  public HashMap<String, HashMap<String, String>> getResources() {
+	return resources;
+}
+  
+  public RESTList getRestList() {
+	return restList;
+}
+public RESTQuery(String argdatasettype)
   {
 	  paramPositions=new  HashMap<Integer,Object>();
 	  parameterNames=new  HashMap<String,Object>();
@@ -66,6 +84,7 @@ public class RESTQuery
 	parameterMetaData=new RESTParameterMetaData(this.paramPositions);
 	restInterface.prepare();
 	restInterface.setRESTlist(restList);
+	 System.out.println(datasettype);
     IResultSet  resultSet= new RESTResultSet(restInterface,resultsetMetaData,datasettype);
     resultSet.setMaxRows(getMaxRows());
     return resultSet;
@@ -121,16 +140,35 @@ public class RESTQuery
   {
 	 this.restList=new RESTList();
 	 this.queryText=queryText;
-	 System.out.println("the querytext "+queryText);
-	 String[] queryarray=queryText.split(";");
-	 restInterface.setQuery(queryarray);
-	 columnsextract=new RESTColumnsExtract(restList);
-	 columnsextract.extract(this.queryText);
-	 resultsetMetaData=new RESTResultSetMetaData(restList);
-	 resultsetMetaData.setColumns();
+	 System.out.println(datasettype);
+	 
+	 if(datasettype.equals(RESTConstants.ODA_DATA_SET_UI_ID))
+	 {
+		 columnsextract=new RESTColumnsExtract(restList);
+		 columnsextract.extract(this.queryText,datasettype);
+		 resources=columnsextract.getResources();
+		 versions=columnsextract.getVersions();
+		 columnmapping=columnsextract.getColumnmapping();
+	
+	 }
+	 else
+	 {
+		 String[] queryarray=queryText.split(";");
+		 restInterface.setQuery(queryarray);
+		 columnsextract=new RESTColumnsExtract(restList);
+		 columnsextract.extract(this.queryText,datasettype);
+		 resultsetMetaData=new RESTResultSetMetaData(restList);
+	 }
+	 
   }
 
-  public void setAppContext(Object context)
+  public HashMap<String, HashMap<String, String>> getColumnmapping() {
+	return columnmapping;
+}
+public HashMap<String, List<String>> getVersions() {
+	return versions;
+}
+public void setAppContext(Object context)
     throws OdaException
   {
     this.logger.finest("SIQ CONTEXT ");

@@ -10,55 +10,182 @@
             defaultDisplayName="%data.source.name"
             setThreadContextClassLoader="false"
             odaVersion="3.2"
-            id="oda.datatools.connectivity.rest.siq">
+            id="%oda.data.source.id">
+            
+            <properties>
+            
+            <propertyGroup
+               defaultDisplayName="Connection Properties"
+               name="connectionProperties">
+            <property
+                  name="OdaDriverClass"
+                  allowsEmptyValueAsNull="true"
+                  defaultDisplayName="User Name"
+                  type="string"
+                  isEncryptable="false">
+            </property>
+            <property
+                  name="username"
+                  allowsEmptyValueAsNull="true"
+                  defaultDisplayName="User Name"
+                  type="string"
+                  isEncryptable="false">
+            </property>
+            <property
+                  name="password"
+                  allowsEmptyValueAsNull="true"
+                  defaultDisplayName="Password"
+                  type="string"
+                  isEncryptable="true">
+            </property>
+              <property
+                  name="ipaddress"
+                  allowsEmptyValueAsNull="false"
+                  defaultDisplayName="IP Address"
+                  type="string"
+                  isEncryptable="false">
+            </property>
+             <property
+                  name="port"
+                  allowsEmptyValueAsNull="false"
+                  defaultDisplayName="Port"
+                  type="string"
+                  isEncryptable="false">
+            </property>
+             <property
+                  name="app"
+                  allowsEmptyValueAsNull="false"
+                  defaultDisplayName="Port"
+                  type="string"
+                  isEncryptable="false"
+                 >
+            </property>
+           </propertyGroup>
+         </properties>
+         
+         
       </dataSource>
       <dataSet
             defaultDisplayName="%data.set.name"
             id="oda.datatools.connectivity.rest.siq.dataSet">
-         <dataTypeMapping
+        <dataTypeMapping
                nativeDataTypeCode="1"
                odaScalarDataType="String"
-               nativeDataType="java.lang.String">
+               nativeDataType="text">
          </dataTypeMapping>
          <dataTypeMapping
                nativeDataTypeCode="4"
                odaScalarDataType="Integer"
-               nativeDataType="java.lang.Integer">
+               nativeDataType="integer">
          </dataTypeMapping>
          <dataTypeMapping
                nativeDataTypeCode="8"
                odaScalarDataType="Double"
-               nativeDataType="java.lang.Double">
+               nativeDataType="float">
          </dataTypeMapping>
          <dataTypeMapping
                nativeDataTypeCode="3"
                odaScalarDataType="Decimal"
-               nativeDataType="java.math.BigDecimal">
+               nativeDataType="bigdecimal">
          </dataTypeMapping>
          <dataTypeMapping
                nativeDataTypeCode="91"
                odaScalarDataType="Date"
-               nativeDataType="java.lang.Date">
+               nativeDataType="Date">
          </dataTypeMapping>
          <dataTypeMapping
                nativeDataTypeCode="92"
                odaScalarDataType="Time"
-               nativeDataType="java.util.Time">
+               nativeDataType="Time">
+         </dataTypeMapping>
+          <dataTypeMapping
+               nativeDataTypeCode="98"
+               odaScalarDataType="JavaObject"
+               nativeDataType="datetime">
          </dataTypeMapping>
          <dataTypeMapping
+               
                nativeDataTypeCode="93"
                odaScalarDataType="Timestamp"
-               nativeDataType="java.sql.Timestamp;">
+               nativeDataType="Timestamp;">
          </dataTypeMapping>
          <dataTypeMapping
                nativeDataTypeCode="16"
                odaScalarDataType="Boolean"
-               nativeDataType="java.lang.Boolean">
+               nativeDataType="boolean">
          </dataTypeMapping>
+        
           <dataTypeMapping
                nativeDataTypeCode="11"
                odaScalarDataType="JavaObject"
-               nativeDataType="java.lang.javaObject">
+               nativeDataType="javaObject">
+         </dataTypeMapping>
+          <dataTypeMapping
+               nativeDataTypeCode="10"
+               odaScalarDataType="String"
+               nativeDataType="uuid">
+         </dataTypeMapping>
+         
+      </dataSet>
+      <dataSet
+            defaultDisplayName="%data.set.name.UI"
+            id="oda.datatools.connectivity.rest.siq.dataSet.UI">
+        <dataTypeMapping
+               nativeDataTypeCode="1"
+               odaScalarDataType="String"
+               nativeDataType="text">
+         </dataTypeMapping>
+         <dataTypeMapping
+               nativeDataTypeCode="4"
+               odaScalarDataType="Integer"
+               nativeDataType="integer">
+         </dataTypeMapping>
+         <dataTypeMapping
+               nativeDataTypeCode="8"
+               odaScalarDataType="Double"
+               nativeDataType="float">
+         </dataTypeMapping>
+         <dataTypeMapping
+               nativeDataTypeCode="3"
+               odaScalarDataType="Decimal"
+               nativeDataType="bigdecimal">
+         </dataTypeMapping>
+         <dataTypeMapping
+               nativeDataTypeCode="91"
+               odaScalarDataType="Date"
+               nativeDataType="Date">
+         </dataTypeMapping>
+         <dataTypeMapping
+               nativeDataTypeCode="92"
+               odaScalarDataType="Time"
+               nativeDataType="Time">
+         </dataTypeMapping>
+          <dataTypeMapping
+               nativeDataTypeCode="98"
+               odaScalarDataType="JavaObject"
+               nativeDataType="datetime">
+         </dataTypeMapping>
+         <dataTypeMapping
+               
+               nativeDataTypeCode="93"
+               odaScalarDataType="Timestamp"
+               nativeDataType="Timestamp;">
+         </dataTypeMapping>
+         <dataTypeMapping
+               nativeDataTypeCode="16"
+               odaScalarDataType="Boolean"
+               nativeDataType="boolean">
+         </dataTypeMapping>
+        
+          <dataTypeMapping
+               nativeDataTypeCode="11"
+               odaScalarDataType="JavaObject"
+               nativeDataType="javaObject">
+         </dataTypeMapping>
+          <dataTypeMapping
+               nativeDataTypeCode="10"
+               odaScalarDataType="String"
+               nativeDataType="uuid">
          </dataTypeMapping>
       </dataSet>
    </extension>
