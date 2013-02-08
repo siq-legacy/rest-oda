@@ -8,8 +8,7 @@ import org.eclipse.datatools.connectivity.oda.util.manifest.DataTypeMapping;
 import org.eclipse.datatools.connectivity.oda.util.manifest.ExtensionManifest;
 import org.eclipse.datatools.connectivity.oda.util.manifest.ManifestExplorer;
 
-public class RESTDriver
-  implements IDriver,RESTConstants
+public class RESTDriver implements IDriver,RESTConstants
 {
  
 

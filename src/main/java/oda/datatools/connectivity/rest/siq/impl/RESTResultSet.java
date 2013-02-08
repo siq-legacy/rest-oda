@@ -27,12 +27,13 @@ public class RESTResultSet
   private RESTResultSetMetaData resultSetMetaData;
   private RESTInterface searchRequest;
   private String datasettype;
-  
-  public RESTResultSet(RESTInterface searchRequest,RESTResultSetMetaData resultSetMetaData,String argdatasettype) throws OdaException
+  private RESTConnection connection;
+  public RESTResultSet(RESTInterface searchRequest,RESTResultSetMetaData resultSetMetaData,String argdatasettype,RESTConnection connectionarg) throws OdaException
   {
     this.resultSetMetaData = resultSetMetaData;
     this.searchRequest=searchRequest;
     this.datasettype=argdatasettype;
+    connection=connectionarg;
    
     if(!argdatasettype.equals(ODA_DATA_SET_UI_ID))
     	setQuery();
@@ -200,10 +201,10 @@ public class RESTResultSet
     return this.currentRow.get(index-1);
   }
 
-  public Object getObject(String arg0)
+  public Object getObject(String columnName)
     throws OdaException
   {
-    return null;
+	  return getInt(findColumn(columnName));
   }
 
   public int getRow()
@@ -215,11 +216,15 @@ public class RESTResultSet
     throws OdaException
   {
 	 
+	 
 	  if(this.currentRow.get(index-1)==null)
+	  {
 		  return null;
+	  }
 	  else
 	  {
-		  return this.currentRow.get(index-1).toString();
+		 
+			  return this.currentRow.get(index-1).toString().trim();	 
 	  }
    
   }
@@ -300,8 +305,7 @@ public class RESTResultSet
   public void setQuery() throws OdaException
   {
 		
-	    System.out.println(" in search");
-	    this.rows = this.searchRequest.executeQuery().getRows();
+	    this.rows = this.searchRequest.executeQuery(connection).getRows();
 	    this.rowIter = this.rows.listIterator();
 	    this.setMaxRows(this.rows.size());
 	 

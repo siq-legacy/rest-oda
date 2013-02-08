@@ -1,14 +1,21 @@
 package oda.datatools.connectivity.rest.siq.impl;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 public class RESTList
 {
   List<String> columnList;
+  HashMap<String,List<String>> complicatedcolumns;
   
-  
-  public void setColumnlist(List<String> columnList) {
+  public HashMap<String,List<String>> getComplicatedcolumns() {
+	return complicatedcolumns;
+}
+public void setComplicatedcolumns(HashMap<String,List<String>> complicatedcolumns) {
+	this.complicatedcolumns = complicatedcolumns;
+}
+public void setColumnlist(List<String> columnList) {
 	this.columnList = columnList;
 }
 

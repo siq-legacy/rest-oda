@@ -2,10 +2,9 @@ package oda.datatools.connectivity.rest.siq.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
-import org.eclipse.datatools.connectivity.oda.util.manifest.DataSetType;
-import org.eclipse.datatools.connectivity.oda.util.manifest.DataTypeMapping;
 public class RESTResultSetMetaData
   implements IResultSetMetaData
 {

@@ -3,13 +3,12 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.logging.Logger;
-import oda.datatools.connectivity.rest.siq.impl.RESTConstants;
+
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
@@ -41,6 +40,8 @@ private RESTParameterMetaData parameterMetaData;
   private String datasettype;
   private HashMap<String,HashMap<String,String>> resources;
   private HashMap<String,HashMap<String,String>> columnmapping;
+  private HashMap<String,String> complicatedcolumnmapping;
+  private RESTConnection connection;
   private HashMap<String,List<String>> versions;
   private RESTList restList;
   
@@ -59,6 +60,14 @@ public RESTQuery(String argdatasettype)
 	  datasettype=argdatasettype;
 	  
   }
+public RESTQuery(String argdatasettype,RESTConnection connectionarg)
+{
+	  paramPositions=new  HashMap<Integer,Object>();
+	  parameterNames=new  HashMap<String,Object>();
+	  restInterface=new RESTInterface();
+	  datasettype=argdatasettype;
+	  connection=connectionarg;
+}
   public void cancel()
     throws OdaException, UnsupportedOperationException
   {
@@ -84,8 +93,7 @@ public RESTQuery(String argdatasettype)
 	parameterMetaData=new RESTParameterMetaData(this.paramPositions);
 	restInterface.prepare();
 	restInterface.setRESTlist(restList);
-	 System.out.println(datasettype);
-    IResultSet  resultSet= new RESTResultSet(restInterface,resultsetMetaData,datasettype);
+  IResultSet  resultSet= new RESTResultSet(restInterface,resultsetMetaData,datasettype,connection);
     resultSet.setMaxRows(getMaxRows());
     return resultSet;
   }
@@ -140,29 +148,58 @@ public RESTQuery(String argdatasettype)
   {
 	 this.restList=new RESTList();
 	 this.queryText=queryText;
-	 System.out.println(datasettype);
-	 
+	 System.out.println("inside prepare"+queryText);
+	 if(columnsextract==null)
+	 {
+		 columnsextract=new RESTColumnsExtract(connection);
+	 }
 	 if(datasettype.equals(RESTConstants.ODA_DATA_SET_UI_ID))
 	 {
-		 columnsextract=new RESTColumnsExtract(restList);
-		 columnsextract.extract(this.queryText,datasettype);
-		 resources=columnsextract.getResources();
-		 versions=columnsextract.getVersions();
-		 columnmapping=columnsextract.getColumnmapping();
-	
+		 if(this.queryText.startsWith(RESTConstants.PARAMETER_1))
+		 {
+			 columnsextract.extract(this.queryText,datasettype);
+			 resources=columnsextract.getResources();
+			 versions=columnsextract.getVersions();
+			 columnmapping=columnsextract.getColumnmapping();
+		 }
+		 else if(this.queryText.startsWith(RESTConstants.PARAMETER_2))
+		 {
+			 String[] array=this.queryText.split(",");
+			 complicatedcolumnmapping=columnsextract.getComplicatedColumnmapping(array[1], array[2], array[3]);
+		 }
+		 else
+		 {
+			 String[] queryarray=queryText.split(",");
+			 String[] columns_names=queryarray[1].split(";");
+			 String[] columns_datatypes=queryarray[2].split(";");
+			 columnsextract.setColumnnames(Arrays.asList(columns_names));
+			 columnsextract.setDatatypes(Arrays.asList(columns_datatypes));
+			 restList.setColumnlist(Arrays.asList(columns_names));
+			 restList.setDatatype(Arrays.asList(columns_datatypes));
+			 restList.setComplicatedcolumns(columnsextract.getComplicatedcolumns());
+			 resultsetMetaData=new RESTResultSetMetaData(restList);
+		 }
 	 }
 	 else
 	 {
-		 String[] queryarray=queryText.split(";");
-		 restInterface.setQuery(queryarray);
-		 columnsextract=new RESTColumnsExtract(restList);
-		 columnsextract.extract(this.queryText,datasettype);
+		 String[] queryarray=queryText.split(",");
+		 String[] columns_names=queryarray[1].split(";");
+		 String[] columns_datatypes=queryarray[2].split(";");
+		 columnsextract.setColumnnames(Arrays.asList(columns_names));
+		 columnsextract.setDatatypes(Arrays.asList(columns_datatypes));
+		 restList.setColumnlist(Arrays.asList(columns_names));
+		 restList.setDatatype(Arrays.asList(columns_datatypes));
+		 restList.setComplicatedcolumns(columnsextract.getComplicatedcolumns());
 		 resultsetMetaData=new RESTResultSetMetaData(restList);
 	 }
 	 
   }
 
-  public HashMap<String, HashMap<String, String>> getColumnmapping() {
+  public HashMap<String, String> getComplicatedcolumnmapping() {
+	return complicatedcolumnmapping;
+}
+
+public HashMap<String, HashMap<String, String>> getColumnmapping() {
 	return columnmapping;
 }
 public HashMap<String, List<String>> getVersions() {
@@ -261,7 +298,7 @@ public void setAppContext(Object context)
 	  restInterface.setRequestMethodList(accessPattern.getRequestMethod());
 	  restInterface.setParameterList(accessPattern.getRequestParameters());
 	  restInterface.setColumnMappingList(accessPattern.getColumnMapping());
-	  
+	  restInterface.setQuery((String[])accessPattern.getQuery().toArray(new String[accessPattern.getQuery().size()]));
   }
 
   public void setObject(int paramPosition, Object paramValue)
@@ -273,7 +310,7 @@ public void setAppContext(Object context)
 	  restInterface.setRequestMethodList(accessPattern.getRequestMethod());
 	  restInterface.setParameterList(accessPattern.getRequestParameters());
 	  restInterface.setColumnMappingList(accessPattern.getColumnMapping());
-	  
+	  restInterface.setQuery((String[])accessPattern.getQuery().toArray(new String[accessPattern.getQuery().size()]));
   }
 
   public void setProperty(String name, String value)

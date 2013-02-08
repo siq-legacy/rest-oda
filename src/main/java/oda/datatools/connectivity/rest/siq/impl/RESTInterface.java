@@ -23,6 +23,16 @@ public class RESTInterface {
 	private Vector<ColumnNameMapping> columnMappingList;
 	private Map<String, Object> dataMapping;
 	private Map<Object, Object> columnMapping;
+	private Map<String,Integer> arraysize;
+	private Map<String,Integer> arrayrunning;
+	private Map<Integer, String> arrayresponse;
+	private int arrayresponsecount;
+	public int getArrayresponsecount() {
+		return arrayresponsecount;
+	}
+	public void setArrayresponsecount() {
+		this.arrayresponsecount = arrayresponsecount+1;
+	}
 	private int position=0;
 	private RESTList siqList;
 	private RESTClient restClient;
@@ -52,6 +62,12 @@ public class RESTInterface {
 		this.columnMappingList = columnMappingList;
 	}
 
+	public String login_app_url(String url)
+	{
+	url=url.substring(0,url.indexOf('/',8))+RESTConstants.LOGIN_URL_APPSTACK;
+		return url;
+		
+	}
 	public void prepare()
 	{
 		restClient=new RESTClient();
@@ -61,6 +77,8 @@ public class RESTInterface {
 		response=null;
 		columnMapping=new HashMap<Object, Object>();
 		columnNameMapping=null;
+		arraysize=new HashMap<String,Integer>();
+		arrayresponse=new HashMap<Integer,String>();
 
 	}
 	private int fillColumnMappings(String response,ColumnNameMapping columnNameMapping)
@@ -81,10 +99,11 @@ public class RESTInterface {
 		        JSONObject obj1 = jsonresourceobj.getJSONObject(j);
 	        this.columnMapping.put(obj1.get(columnNameMapping.getSourceKey()), obj1.get(columnNameMapping.getSourceValue()));
 		  }
-	     return jsonresourceobj.size();
+	      return jsonresourceobj.size();
 	}
-	public RESTList executeQuery() throws OdaException
+	public RESTList executeQuery(RESTConnection connection) throws OdaException
 	{
+		
 		if(limitReached)
 		{
 			this.siqList.reset();
@@ -93,6 +112,8 @@ public class RESTInterface {
 		while(position<query.length)
 		{
 			RequestMethod method=requestMethodList.get(position);
+			
+			
 			Map<String, Object> param=parameterList.get(position);
 			 switch(method) 
 	         {
@@ -112,13 +133,35 @@ public class RESTInterface {
 					{
 						params.add(new NameValuePair(entry.getKey(),entry.getValue().toString()));
 					}
-					params.add(new NameValuePair("offset",String.valueOf(offset)));
-					params.add(new NameValuePair("limit",String.valueOf(limit)));
-					offset+=limit;
+					
 					
 					try
 					{
-						response=restClient.ExecuteGet(params,query[position]);
+						if(connection.getApi().equalsIgnoreCase(RESTConstants.APPSTACK))
+						 {
+							 if(restClient.ExecuteHEAD(login_app_url(query[position]),connection.getUsername(),connection.getPassword())==false)
+							 {
+								
+								 throw new OdaException("Connection to datasource failed ,pls check the datasource again");
+							 }
+							 else
+							 {
+								 StringBuffer url=new StringBuffer(query[position]);	 
+								 url.insert(query[position].indexOf('/',10)+1,RESTConstants.APPSTACK_PROXY).toString();
+								 query[position]=url.toString();
+							 }
+							 response=restClient.ExecuteGet(null,query[position]);
+						 }
+						else
+						{
+							params.add(new NameValuePair("offset",String.valueOf(offset)));
+							params.add(new NameValuePair("limit",String.valueOf(limit)));
+							offset+=limit;
+							response=restClient.ExecuteGet(params,query[position]);
+							
+						}
+						
+					
 						
 					}
 					catch(Exception ex)
@@ -126,6 +169,7 @@ public class RESTInterface {
 						ex.printStackTrace();
 						throw new OdaException("Data from the Server has Exception");
 					}
+					System.out.println("the Query "+restClient.getUrl());
 					System.out.println("the response"+response);
 					columnNameMapping=columnMappingList.get(position);
 					if(columnNameMapping!=null)
@@ -193,26 +237,45 @@ public class RESTInterface {
 					  JSONObject jb = JSONObject.fromObject(response);
 				      JSONArray jsonresourceobj = null;
 				      Iterator i = jb.entrySet().iterator();
-				      while (i.hasNext()) {
+				      while (i.hasNext())
+				      {
 				        Map.Entry e = (Map.Entry)i.next();
 				        if (e.getKey().equals("resources"))
 				        {
 				          jsonresourceobj = (JSONArray)e.getValue();
+				          for (int j = 0; j < jsonresourceobj.size(); j++)
+						  {
+				        	  
+				        	    arraysize=new HashMap<String,Integer>();
+				        	    arrayrunning=new HashMap<String,Integer>();
+				        	    setArrayresponsecount();
+				        	    siqList.createRow();
+						        JSONObject obj1 = jsonresourceobj.getJSONObject(j);
+						        arrayresponse.put(this.getArrayresponsecount(),obj1.toString());
+						        extraction(null,obj1.toString(),false,false);  
+						        siqList.addtoRowList();
+						        
+						  }
 				        }
-
-				      }
-
-				      for (int j = 0; j < jsonresourceobj.size(); j++)
-					  {
-				    	    siqList.createRow();
-					        JSONObject obj1 = jsonresourceobj.getJSONObject(j);
-					        extraction(obj1.toString());  
-					        siqList.addtoRowList();
-
-					  }
+				        else
+				        {
+				        	if(e.getKey().toString().equals("total"))
+				        		continue;
+				        	arraysize=new HashMap<String,Integer>();
+			        	    arrayrunning=new HashMap<String,Integer>();
+			        	    setArrayresponsecount();
+				        	siqList.createRow();
+				        	arrayresponse.put(this.getArrayresponsecount(),response.toString());
+				        	extraction(null,response.toString(),false,false);
+				        	siqList.addtoRowList();
+				        	break;
+				        	
+				        	
+				        }
+				      }   
 			      }
 				response=null;
-				System.out.println("the siqlist"+siqList.getRow());
+				System.out.println("the siqlist "+siqList.getRows());
 				if(siqList.getRows().size()<500)
 				{
 					limitReached=true;
@@ -239,137 +302,200 @@ public class RESTInterface {
 		this.siqList = siqList;
 	}
 
-	public void extraction(String JSONString) {
+	public boolean extraction(String parent,String JSONString,boolean parentcheck,boolean levelcheck)
+	{	
 	    JSONObject jsonobj = JSONObject.fromObject(JSONString);
 	    Iterator i = jsonobj.entrySet().iterator();
-	    while (i.hasNext()) {
+	    while (i.hasNext()) 
+	    {
 	      Map.Entry e = (Map.Entry)i.next();
 	      
-	      if (e.getValue().getClass().getName() != "net.sf.json.JSONObject")
+	      if (e.getValue().getClass().getName() == "net.sf.json.JSONArray"||e.getValue().getClass().getName() == "net.sf.json.JSONObject")
 	      {
-	    	  
-	    	        boolean check=false;
-	    	  		for(int j=0;j<columnMappingList.size();j++)
-	    	    	{
-	    	    		ColumnNameMapping columnNameMapping=columnMappingList.get(j);
-	    	    		if(columnNameMapping!=null)
-	    	    		{
-	    	    			int position=this.siqList.getColumnlist().indexOf(e.getKey());
-	    	    	    	if(position!=-1)
-	    	    	    	if(columnNameMapping.getDestinationKey().equals(e.getKey())&&columnMapping.get(e.getValue())!=null)
-	    	    	    	{
-	    	    	    			position=this.siqList.getColumnlist().indexOf(columnNameMapping.getSourceValue());
-	    	    			    	this.siqList.addObj(columnMapping.get(e.getValue()),position);
-	    	    	
-	    	    	    	}
-	    	    	    	else
-	    	    	    	{
-	    	    	    			this.siqList.addObj(e.getValue(),position);
-	    	    	    	}
-	    	    	    	check=true;
-	    	    	   }
-	    	    	 
-    	    		   
-	    	    	}
-	    	  		if(!check)
-		    	    {
-		    	    	int position=this.siqList.getColumnlist().indexOf(e.getKey());
-		   		    	if(position!=-1)
-		   		    	this.siqList.addObj(e.getValue(),position);
-		    	    }
-	    	  		
-	    	  		
-
-	      }
-
-	    }
-	}
-
-	/* 
-	 public void catalyst2(String obj1, int col,Object key,Object value) {
-	    JSONObject jsonobj = JSONObject.fromObject(obj1.toString());
-	    Iterator i = jsonobj.entrySet().iterator();
-	    while (i.hasNext()) {
-	      Map.Entry e = (Map.Entry)i.next();
-	      if (e.getValue().getClass().getName() == "net.sf.json.JSONObject")
-	      {
-	    	  catalyst2(e.getValue().toString(), col,key,value);
+	    	 
+	    	  if(parent==null)
+	    	  {
+	    		  parent=e.getKey().toString();
+	  	    	
+	    	  }
+	    	  else
+	    	  {
+	    		  parent=parent+"@"+e.getKey().toString();
+	    	  }
+	    	
+	    	  if(columncheck(parent,this.siqList.getColumnlist()))
+			  {
+	    		  String type=checkobjectarray(e.getValue());
+	    		  switch(type)
+	    		  {
+	    		  		case "object":
+	    		  			extraction(parent,e.getValue().toString(),true,true);
+	    		  			break;
+	    		  		case "array":
+	    		  			JSONArray jarray=(JSONArray)e.getValue();
+	    		  			if(arraysize.get(parent)==null)
+	    		  			{
+	    		  				arraysize.put(parent, jarray.size());
+	    		  			}	
+	    		  			if(arrayrunning.get(parent)==null)
+	    		  			{
+	    		  				arrayrunning.put(parent, -1);
+	    		  			}
+	    		  			if(arrayrunning.get(parent).equals(arraysize.get(parent)-1))
+	    		  			{
+	    		  				extraction(parent,jarray.getString(arrayrunning.get(parent)).toString(),true,true);
+	    		  				
+	    		  			}
+	    		  			else
+	    		  			{
+	    		  				arrayrunning.put(parent, arrayrunning.get(parent)+1);
+	    		  				extraction(parent,jarray.getString(arrayrunning.get(parent)).toString(),true,true);
+	    		  			}
+	    		  			break;
+	    		  }  
+			  }
 	      }
 	      else
 	      {
-	    	int position=this.siqList.getColumnlist().indexOf(e.getKey());
-	    	if(position!=-1)
-	    	{
-	    		if(e.getValue().equals(key))
-	    		{
-	    			this.siqList.addObj(value,position);
-	    		}
-	    		else
-	    		{
-	    			this.siqList.addObj(e.getValue().toString(),position);
-	    		}
-	    		
-	    	}
-	    	
+		    	boolean check=false;
+	  	  		for(int j=0;j<columnMappingList.size();j++)
+	  	    	{
+	  	    		ColumnNameMapping columnNameMapping=columnMappingList.get(j);
+	  	    		if(columnNameMapping!=null)
+	  	    		{
+	  	        	
+	  	    			int position=this.siqList.getColumnlist().indexOf(e.getKey());
+	  	    	    	if(position!=-1)
+	  	    	    	if(columnNameMapping.getDestinationKey().equals(e.getKey())&&columnMapping.get(e.getValue())!=null)
+	  	    	    	{
+	  	    	    			position=this.siqList.getColumnlist().indexOf(columnNameMapping.getSourceValue());
+	  	    	    			
+	  	    	    			if(this.siqList.getDatatype().get(this.siqList.getColumnlist().indexOf(columnNameMapping.getSourceValue())).equalsIgnoreCase("uuid"))
+	  	    	    			{
+	  	    	    				this.siqList.addObj(columnMapping.get(e.getValue()).toString().replaceAll("-", "").toUpperCase(),position);
+	  	    	    			}
+	  	    	    			else
+	  	    	    			{
+	  	    	    				this.siqList.addObj(columnMapping.get(e.getValue()),position);
+	  	    	    			}
+	  	    			    
+	  	    	
+	  	    	    	}
+	  	    	    	else
+	  	    	    	{
+		  	    	    		if(this.siqList.getDatatype().get(this.siqList.getColumnlist().indexOf(e.getKey())).equalsIgnoreCase("uuid"))
+	  	    	    			{
+		  	    	    			this.siqList.addObj(e.getValue().toString().replaceAll("-", "").toUpperCase(),position);
+	  	    	    			}
+		  	    	    		else
+		  	    	    		{
+		  	    	    			this.siqList.addObj(e.getValue(),position);
+		  	    	    		}
+		  	    	    			
+	  	    	    		
+	  	    	    	}
+	  	    	    	check=true;
+	  	    	   }
+	  	    	 
+		    		   
+	  	    	}
+	  	  		if(!check)
+		    	    {
+	  	  			
+	  	  			
+		  	  			String parentparam=null;
+			    		if(parentcheck)
+			    		{
+			    			parentparam=parent;
+			    			parentparam=parentparam+"@"+e.getKey().toString();
+			    		}
+			    	
+			    		if(parentparam!=null)
+			    		{
+		   		    		position=this.siqList.getColumnlist().indexOf(parentparam);
+			   		    	if(position!=-1)
+			   		    	{
+			   		    		if(this.siqList.getDatatype().get(this.siqList.getColumnlist().indexOf(parentparam)).equalsIgnoreCase("uuid"))
+	  	    	    			{
+			   		    			this.siqList.addObj(e.getValue().toString().replaceAll("-", "").toUpperCase(),position);
+	  	    	    			}
+			   		    		else
+			   		    		{
+			   		    			this.siqList.addObj(e.getValue(),position);
+			   		    		}
+			   		    		
+			   		    	}
+			    		}
+			    		else
+			    		{
+			    			int position=this.siqList.getColumnlist().indexOf(e.getKey());
+			   		    	if(position!=-1)
+			   		    	{
+			   		    		if(this.siqList.getDatatype().get(this.siqList.getColumnlist().indexOf(e.getKey())).equalsIgnoreCase("uuid"))
+	  	    	    			{
+		  	    	    			this.siqList.addObj(e.getValue().toString().replaceAll("-", "").toUpperCase(),position);
+	  	    	    			}
+		  	    	    		else
+		  	    	    		{
+		  	    	    			this.siqList.addObj(e.getValue(),position);
+		  	    	    		}
+			   		    		
+			   		    	}
+			   		    	
+			    		}
+		    	    	
+		   		    	
+		    	    }
 	      }
+	    	  
 	    }
-	  } 
-	 public void catalyst1(String obj1, int col,Map<String, String> columnmappingstring) {
-		    JSONObject jsonobj = JSONObject.fromObject(obj1.toString());
-		    Iterator i = jsonobj.entrySet().iterator();
-		    while (i.hasNext()) {
-		      Map.Entry e = (Map.Entry)i.next();
-		      if (e.getValue().getClass().getName() == "net.sf.json.JSONObject")
-		      {
-		    	  catalyst1(e.getValue().toString(), col,columnmappingstring);
-		      }
-		      else
-		      { 
-		    	if(response!=null)
-		    	{
-		    		Object key = null;
-		    		Object value = null;
-		    		for (Map.Entry<String, String> entry : columnmappingstring.entrySet())
-					{
-		    			key=jsonobj.get(entry.getKey());
-		    			value=jsonobj.get(entry.getValue());
-		    			
-					}
-
-		    		  JSONObject jb = JSONObject.fromObject(response);
-				      JSONArray jsonresourceobj = null;
-				      Iterator it = jb.entrySet().iterator();
-				      while (it.hasNext()) {
-				        Map.Entry en = (Map.Entry)it.next();
-				        if (en.getKey().equals("resources"))
-				        {
-				          jsonresourceobj = (JSONArray)en.getValue();
-				        }
-				      }
-				      for (int j = 0; j < jsonresourceobj.size(); j++)
-					  {
-					        
-					        JSONObject obj2 = jsonresourceobj.getJSONObject(j);
-					      	this.siqList.createRow();
-				        	catalyst2(obj2.toString(),j,key,value);
-				        	if(this.siqList.getRow().contains(value))
-				        	{
-				        		  this.siqList.addtoRowList();   
-				        	}
-						  
-					  }
-				      return ;
-		    	}
-		    	else
-		    	{
-		    		int position=this.siqList.getColumnlist().indexOf(e.getKey());
-			    	if(position!=-1)
-			    	this.siqList.addObj(e.getValue(),position);
-		    	}
-		    
-		      }
-		    }
-		  }
-		  */
+	    boolean pcheck=false;
+	    for (Map.Entry<String, Integer> entry : arraysize.entrySet())
+		{
+	    	if(arrayrunning.get(entry.getKey()).equals(entry.getValue()-1))
+	    	{
+	    		pcheck=false;
+	    	}
+	    	else
+	    	{
+	    		pcheck=true;
+	    		break;
+	    	}
+		}
+	    if(!levelcheck&&pcheck)
+		{
+			siqList.addtoRowList();
+		 	siqList.createRow();
+    		extraction(null,arrayresponse.get(this.getArrayresponsecount()),false,false);
+    		
+		}
+	    return pcheck;
+	    
+	}
+	public String checkobjectarray(Object value)
+	{
+		if(value instanceof JSONObject)
+		{
+			return "object";
+		}
+		else if(value instanceof JSONArray)
+		{
+			return "array";
+		}
+		else
+		{
+			return null;
+		}
+	}
+	public boolean columncheck(String item,List<String> columnlist)
+	{
+		List<String> child=this.getRESTlist().getComplicatedcolumns().get(item);
+	
+		if(child!=null)
+			return true;
+		else 
+			return false;
+		
+	}
 
 }

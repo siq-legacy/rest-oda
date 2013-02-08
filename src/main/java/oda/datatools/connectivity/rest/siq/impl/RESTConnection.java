@@ -1,7 +1,5 @@
 package oda.datatools.connectivity.rest.siq.impl;
-import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,8 +11,6 @@ import org.eclipse.datatools.connectivity.oda.IConnection;
 import org.eclipse.datatools.connectivity.oda.IDataSetMetaData;
 import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.eclipse.datatools.connectivity.oda.OdaException;
-import org.eclipse.datatools.connectivity.oda.util.manifest.ExtensionManifest;
-import org.eclipse.datatools.connectivity.oda.util.manifest.Property;
 
 import com.ibm.icu.util.ULocale;
 public class RESTConnection
@@ -22,35 +18,35 @@ public class RESTConnection
 {
  
   private boolean isOpen = false;
-  private static String IpAddress=null;
-  private static String Port=null;
-  private static String Username=null;
-  private static String Password=null;
-  private static String Url=null;
-  private static String api=null;
+  private  String IpAddress=null;
+  private  String Port=null;
+  private  String Username=null;
+  private  String Password=null;
+  private  String Url=null;
+  private  String api=null;
   
-  public static String getApi() {
+  public  String getApi() {
 	return api;
 }
 
 public  void setApi(String api) {
-	RESTConnection.api = api;
+	this.api = api;
 }
 private Map<String, IQuery> queryMap = new HashMap<String, IQuery>();
   private Map<String, RESTQuery> restqueryMap = new HashMap<String, RESTQuery>();
-  public static String getUrl() {
+  public  String getUrl() {
 	return Url;
 }
 
-public static String getIpAddress() {
-	return IpAddress;
+public  String getIpAddress() {
+	return this.IpAddress;
 }
 
 private void setIpAddress(String ipAddress) {
 	IpAddress = ipAddress;
 }
 
-public static String getPort() {
+public  String getPort() {
 	return Port;
 }
 
@@ -58,7 +54,7 @@ private void setPort(String port) {
 	Port = port;
 }
 
-public static String getUsername() {
+public  String getUsername() {
 	return Username;
 }
 
@@ -66,7 +62,7 @@ private void setUsername(String username) {
 	Username = username;
 }
 
-public static String getPassword() {
+public  String getPassword() {
 	return Password;
 }
 
@@ -157,14 +153,17 @@ private void setPassword(String password) {
 		  
 		  	Socket sock=new Socket(getIpAddress(),Integer.parseInt(getPort()));
 		  	sock.close();
-		  	
 	  }
 	  catch(Exception ex)
 	  {
 		  if (ex.getMessage().contains("refused"))
 		  {
+			  System.out.println("connection refusal");		  
+		  }
+		  else if(ex.getMessage().contains("timed"))
+		  {
+			  System.out.println("connection timedout");		
 			  return null;
-			  
 		  }
 	  }
 	  String prepPort="8765";
@@ -174,9 +173,11 @@ private void setPassword(String password) {
 		  	Socket sock=new Socket(getIpAddress(),Integer.parseInt(prepPort));
 		  	sock.close();
 		  	
+		  	
 	  }
 	  catch(Exception ex)
 	  {
+		  System.out.println(ex.getLocalizedMessage());
 		  if (ex.getMessage().contains("refused"))
 		  {
 			  Url="http://"+getIpAddress()+RESTConstants.LOGIN_URL_APPSTACK;
@@ -187,6 +188,7 @@ private void setPassword(String password) {
 			  }
 			  else
 			  {
+		
 				  return null;
 			  }
 		  }
@@ -218,7 +220,7 @@ private void setPassword(String password) {
 		     
 		      return aQuery;
 		    }
-		    aQuery = new RESTQuery(dataSetType);
+		    aQuery = new RESTQuery(dataSetType,this);
 		    this.restqueryMap.put(dataSetType, aQuery);
 
 		    return aQuery;
@@ -231,7 +233,7 @@ public IQuery newQuery(String dataSetType) throws OdaException {
 	     
 	      return aQuery;
 	    }
-	    aQuery = new RESTQuery(dataSetType);
+	    aQuery = new RESTQuery(dataSetType,this);
 	    this.queryMap.put(dataSetType, aQuery);
 
 	    return aQuery;

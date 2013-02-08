@@ -18,9 +18,16 @@ public class AccessPattern{
 	private Vector<Map<String, Object>> requestParameters;
 	private Vector<Map<String, String>> dataMapping;
 	private Vector<ColumnNameMapping> columnMapping;
+	private Vector<String> query;
 	
 	
 	
+	public Vector<String>getQuery() {
+		return query;
+	}
+	public void setQuery(Vector<String> query) {
+		this.query = query;
+	}
 	public Vector<RequestMethod> getRequestMethod() {
 		return requestMethod;
 	}
@@ -35,11 +42,12 @@ public class AccessPattern{
 		return columnMapping;
 	}
 	
-	public void setqueryString(RequestMethod requestMethod,DataMapping datamapping) {
+	public void setqueryString(String query,RequestMethod requestMethod,DataMapping datamapping) {
 			this.requestMethod.add(requestMethod);
 			this.requestParameters.add(datamapping.getParameters());
 			this.dataMapping.add(datamapping.getResponseRequestMapping());
 			this.columnMapping.add(datamapping.getColumnNameMapping());
+			this.query.add(query);
 		
 	}
 	public AccessPattern()
@@ -48,6 +56,7 @@ public class AccessPattern{
 		 requestParameters=new  Vector<Map<String, Object>>();
 		 dataMapping=new Vector<Map<String, String>>();
 		 columnMapping=new Vector<ColumnNameMapping>();
+		 query=new Vector<String>();
 	}
 	
 	

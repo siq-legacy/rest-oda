@@ -33,5 +33,16 @@ public interface RESTConstants {
 	public final String EXPLORERS="exploreres";
 	public final String ENAMEL="enamel";
 	
+	public final String COMP_DATA_TYPE1="sequence";
+	public final String COMP_DATA_TYPE2="structure";
 	
+	public final String SEQUENCE_DATATYPE_PASS1="item";
+	public final String SEQUENCE_DATATYPE_PASS2="structure";
+	
+	
+	public final String PARAMETER_1="API";
+	public final String PARAMETER_2="COLUMN";
+	
+	
+	public final String APPSTACK_PROXY="proxy/";
 }
