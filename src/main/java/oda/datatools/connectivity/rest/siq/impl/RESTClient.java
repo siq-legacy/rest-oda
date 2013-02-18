@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.Socket;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -198,9 +200,29 @@ public class RESTClient implements RESTConstants {
             request.abort();
             return this.getResponse();
     }
+    public void clientconnectiontest(RESTConnection   connection) throws UnknownHostException, IOException
+    {
     
+    
+   	
+   		  	if(connection.getApi().equalsIgnoreCase(RESTConstants.APPSTACK))
+   		  	{
+	   		  	Socket sock=new Socket(connection.getIpAddress(),443);
+	   		  	sock.close();
+   		  	}
+   		  	else if(connection.getApi().equalsIgnoreCase(RESTConstants.GATEWAY))
+   		  	{
+	   		  	Socket sock=new Socket(connection.getIpAddress(),8765);
+	   		  	sock.close();
+   		  	}
+   		  	
+ 
+   	 
+    }
     private HttpResponse executeRequest(HttpUriRequest request) throws OdaException,HttpRetryException
     {
+    	
+    
      	try {
 			client =RESTHttpClientFactory.getThreadSafeClient();
 		} catch (KeyManagementException e1) {

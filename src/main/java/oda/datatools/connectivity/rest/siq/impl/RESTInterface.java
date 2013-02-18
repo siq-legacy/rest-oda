@@ -1,5 +1,7 @@
 package oda.datatools.connectivity.rest.siq.impl;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -109,6 +111,19 @@ public class RESTInterface {
 			this.siqList.reset();
 			return this.siqList;
 		}
+		try {
+			restClient.clientconnectiontest(connection);
+		} 
+		catch (UnknownHostException e1)
+		{
+			e1.printStackTrace();
+			throw new OdaException("Connection to datasource failed ,pls check the datasource again "+e1.getMessage());
+		
+		}catch(IOException e1) {
+		
+			e1.printStackTrace();
+			throw new OdaException("Connection to datasource failed ,pls check the datasource again"+e1.getMessage());
+		}
 		while(position<query.length)
 		{
 			RequestMethod method=requestMethodList.get(position);
@@ -137,6 +152,7 @@ public class RESTInterface {
 					
 					try
 					{
+
 						if(connection.getApi().equalsIgnoreCase(RESTConstants.APPSTACK))
 						 {
 							 if(restClient.ExecuteHEAD(login_app_url(query[position]),connection.getUsername(),connection.getPassword())==false)

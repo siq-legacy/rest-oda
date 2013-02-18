@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.eclipse.birt.core.exception.BirtException;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
@@ -93,7 +94,7 @@ public RESTQuery(String argdatasettype,RESTConnection connectionarg)
 	parameterMetaData=new RESTParameterMetaData(this.paramPositions);
 	restInterface.prepare();
 	restInterface.setRESTlist(restList);
-  IResultSet  resultSet= new RESTResultSet(restInterface,resultsetMetaData,datasettype,connection);
+	IResultSet  resultSet= new RESTResultSet(restInterface,resultsetMetaData,datasettype,connection);
     resultSet.setMaxRows(getMaxRows());
     return resultSet;
   }
