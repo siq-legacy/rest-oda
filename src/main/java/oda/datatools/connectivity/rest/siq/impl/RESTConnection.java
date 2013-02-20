@@ -180,7 +180,7 @@ private void setPassword(String password) {
 		  System.out.println(ex.getLocalizedMessage());
 		  if (ex.getMessage().contains("refused"))
 		  {
-			  Url="http://"+getIpAddress()+RESTConstants.LOGIN_URL_APPSTACK;
+			  Url="https://"+getIpAddress()+RESTConstants.LOGIN_URL_APPSTACK;
 			  RESTClient rc=new RESTClient();
 			  if(rc.ExecuteHEAD(Url,this.getUsername(),this.getPassword())==true)
 			  {

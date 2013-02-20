@@ -106,7 +106,7 @@ public class RESTColumnsExtract implements RESTConstants {
 		HashMap<String,Object> rawcolumn=rawcolumnmapping.get(resource);
 	
 		JSONObject jb=JSONObject.fromObject(rawcolumn.get(column));
-		
+		System.out.println(resource+" "+column+" "+datatype+" "+jb.toString());
 		if(jb.get(DATATYPE).equals(RESTConstants.COMP_DATA_TYPE1))
 		{
 			Object item=jb.get(SEQUENCE_DATATYPE_PASS1);
@@ -150,7 +150,7 @@ public class RESTColumnsExtract implements RESTConstants {
 							
 							 if(connection.getApi().equals(RESTConstants.APPSTACK))
 							 {
-								 url="http://"+connection.getIpAddress()+RESTConstants.LOGIN_URL_APPSTACK;
+								 url="https://"+connection.getIpAddress()+RESTConstants.LOGIN_URL_APPSTACK;
 								 if(rc.ExecuteHEAD(url,connection.getUsername(),connection.getPassword())==false)
 								 {
 									
@@ -161,7 +161,7 @@ public class RESTColumnsExtract implements RESTConstants {
 									
 									 if(cons[1].equals(ENAMEL))
 									 {
-										 url="http://"+connection.getIpAddress()+connection.APPSTACK_ENAMEL_SPECIFICATION;
+										 url="https://"+connection.getIpAddress()+connection.APPSTACK_ENAMEL_SPECIFICATION;
 									 }
 								 }
 								
