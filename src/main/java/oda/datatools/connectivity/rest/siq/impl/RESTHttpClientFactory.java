@@ -14,26 +14,24 @@ import org.apache.http.impl.conn.PoolingClientConnectionManager;
 
 public class RESTHttpClientFactory
 {
-  private static HttpClient client;
+  private HttpClient client;
 
-  public static synchronized HttpClient getThreadSafeClient() throws KeyManagementException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
+  public RESTHttpClientFactory() throws KeyManagementException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
   {
 	  SchemeRegistry schemeRegistry = new SchemeRegistry();
       schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
       schemeRegistry.register(new Scheme("https", 443, new MockSSLSocketFactory()));
+     
+      PoolingClientConnectionManager cm = new PoolingClientConnectionManager(schemeRegistry);   	  
+      cm.setMaxTotal(100);
+      cm.setDefaultMaxPerRoute(10);
+      client = new DefaultHttpClient(cm);
+   
 
-    if (client != null)
-    {
-    	return client;
-    }
-    else
-    {
-    	  PoolingClientConnectionManager cm = new PoolingClientConnectionManager(schemeRegistry);   	  
-          cm.setMaxTotal(100);
-          cm.setDefaultMaxPerRoute(10);
-          client = new DefaultHttpClient(cm);
-    	  return client;
-    }
+  }
+  public  HttpClient getClient() {
+	
+    return client;
     
  
   }

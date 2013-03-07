@@ -48,6 +48,8 @@ public class RESTClient implements RESTConstants {
     private HttpRoute route;
     private int hitcounts;
     private String url;
+    private RESTHttpClientFactory clientfactory;
+   
     public String getUrl() {
 		return url;
 	}
@@ -69,6 +71,24 @@ public class RESTClient implements RESTConstants {
     }
     public RESTClient()
     {
+    
+    	try
+    	{
+    		clientfactory =new RESTHttpClientFactory();
+  
+	    } catch (KeyManagementException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (UnrecoverableKeyException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (NoSuchAlgorithmException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (KeyStoreException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
     	hitcounts=0;
     }
     public boolean  ExecuteHEAD(String url,String Username,String Password) throws Exception
@@ -222,28 +242,10 @@ public class RESTClient implements RESTConstants {
     private HttpResponse executeRequest(HttpUriRequest request) throws OdaException,HttpRetryException
     {
     	
-    
-     	try {
-			client =RESTHttpClientFactory.getThreadSafeClient();
-		} catch (KeyManagementException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			throw new OdaException("KeyManagementException "+ e1.getMessage());
+	    	
 			
-		} catch (UnrecoverableKeyException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			throw new OdaException("UnrecoverableKeyException "+ e1.getMessage());
-		} catch (NoSuchAlgorithmException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			throw new OdaException("NoSuchAlgorithmException "+ e1.getMessage());
-		} catch (KeyStoreException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			throw new OdaException("KeyStoreException "+ e1.getMessage());
-		}
-     	
+			
+        HttpClient client =clientfactory.getClient();	
      	ManagedClientConnection conn = null;
         httpResponse=null;
         try {
