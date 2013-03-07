@@ -43,7 +43,6 @@ public class RESTClient implements RESTConstants {
     private String message;
     private String response;
     private HttpResponse httpResponse;
-    private HttpClient client;
     private HttpHost host;
     private HttpRoute route;
     private int hitcounts;

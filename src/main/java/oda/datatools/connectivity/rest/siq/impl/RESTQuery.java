@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
-import org.eclipse.birt.core.exception.BirtException;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
@@ -89,8 +87,6 @@ public RESTQuery(String argdatasettype,RESTConnection connectionarg)
     throws OdaException
   {
     this.logger.finest("EXECUTE QUERY");
-    //till now one instance of accesspattern is supported
-    System.out.println("the execute query");
 	parameterMetaData=new RESTParameterMetaData(this.paramPositions);
 	restInterface.prepare();
 	restInterface.setRESTlist(restList);
@@ -149,7 +145,7 @@ public RESTQuery(String argdatasettype,RESTConnection connectionarg)
   {
 	 this.restList=new RESTList();
 	 this.queryText=queryText;
-	 System.out.println("inside prepare"+queryText);
+	 System.out.println("inside prepare "+queryText);
 	 if(columnsextract==null)
 	 {
 		 columnsextract=new RESTColumnsExtract(connection);

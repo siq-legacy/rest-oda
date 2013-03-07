@@ -85,7 +85,6 @@ public class RESTColumnsExtract implements RESTConstants {
 				}		
 			}
 		}
-		System.out.println("the columnsextrac "+complicatedcolumns);
 	
 		
 	}

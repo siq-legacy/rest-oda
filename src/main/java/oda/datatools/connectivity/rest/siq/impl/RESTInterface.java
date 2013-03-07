@@ -186,7 +186,6 @@ public class RESTInterface {
 						throw new OdaException("Data from the Server has Exception");
 					}
 					System.out.println("the Query "+restClient.getUrl());
-					System.out.println("the response"+response);
 					columnNameMapping=columnMappingList.get(position);
 					if(columnNameMapping!=null)
 					{
@@ -291,7 +290,6 @@ public class RESTInterface {
 				      }   
 			      }
 				response=null;
-				System.out.println("the siqlist "+siqList.getRows());
 				if(siqList.getRows().size()<500)
 				{
 					limitReached=true;
