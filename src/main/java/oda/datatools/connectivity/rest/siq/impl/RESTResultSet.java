@@ -305,7 +305,7 @@ public class RESTResultSet
   public void setQuery() throws OdaException
   {
 		
-	    this.rows = this.searchRequest.executeQuery(connection).getRows();
+	    this.rows = this.searchRequest.executeQuery(connection,this.datasettype).getRows();
 	    this.rowIter = this.rows.listIterator();
 	    this.setMaxRows(this.rows.size());
 	 

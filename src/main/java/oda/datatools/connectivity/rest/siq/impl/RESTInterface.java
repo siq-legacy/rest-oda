@@ -1,7 +1,5 @@
 package oda.datatools.connectivity.rest.siq.impl;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -103,7 +101,7 @@ public class RESTInterface {
 		  }
 	      return jsonresourceobj.size();
 	}
-	public RESTList executeQuery(RESTConnection connection) throws OdaException
+	public RESTList executeQuery(RESTConnection connection,String datasettype) throws OdaException
 	{
 		
 		if(limitReached)
@@ -111,23 +109,16 @@ public class RESTInterface {
 			this.siqList.reset();
 			return this.siqList;
 		}
-		try {
-			restClient.clientconnectiontest(connection);
-		} 
-		catch (UnknownHostException e1)
-		{
-			e1.printStackTrace();
-			throw new OdaException("Connection to datasource failed ,pls check the datasource again "+e1.getMessage());
-		
-		}catch(IOException e1) {
-		
-			e1.printStackTrace();
-			throw new OdaException("Connection to datasource failed ,pls check the datasource again"+e1.getMessage());
-		}
 		while(position<query.length)
 		{
 			RequestMethod method=requestMethodList.get(position);
 			
+			if(method==null)
+			{
+				/*
+				 * This is a test where UI design is used using the NON-UI dataset so that this can be used as a template without any changes from the design part later"
+				 */
+			}
 			
 			Map<String, Object> param=parameterList.get(position);
 			 switch(method) 
@@ -152,7 +143,6 @@ public class RESTInterface {
 					
 					try
 					{
-
 						if(connection.getApi().equalsIgnoreCase(RESTConstants.APPSTACK))
 						 {
 							 if(restClient.ExecuteHEAD(login_app_url(query[position]),connection.getUsername(),connection.getPassword())==false)
@@ -166,14 +156,17 @@ public class RESTInterface {
 								 url.insert(query[position].indexOf('/',10)+1,RESTConstants.APPSTACK_PROXY).toString();
 								 query[position]=url.toString();
 							 }
-							 response=restClient.ExecuteGet(null,query[position]);
+							 
+							 
+							 
+							 response=restClient.ExecuteGet(null,query[position],datasettype);
 						 }
 						else
 						{
 							params.add(new NameValuePair("offset",String.valueOf(offset)));
 							params.add(new NameValuePair("limit",String.valueOf(limit)));
 							offset+=limit;
-							response=restClient.ExecuteGet(params,query[position]);
+							response=restClient.ExecuteGet(params,query[position],datasettype);
 							
 						}
 						
@@ -186,6 +179,7 @@ public class RESTInterface {
 						throw new OdaException("Data from the Server has Exception");
 					}
 					System.out.println("the Query "+restClient.getUrl());
+					System.out.println("the response"+response);
 					columnNameMapping=columnMappingList.get(position);
 					if(columnNameMapping!=null)
 					{
@@ -220,7 +214,7 @@ public class RESTInterface {
 
 					try
 					{
-						response=restClient.ExecutePost(jsonlist,query[position]);
+						response=restClient.ExecutePost(jsonlist,query[position],datasettype);
 					}
 					catch(Exception ex)
 					{
@@ -249,47 +243,11 @@ public class RESTInterface {
 			{
 				if (response != null)
 			    {
-					  JSONObject jb = JSONObject.fromObject(response);
-				      JSONArray jsonresourceobj = null;
-				      Iterator i = jb.entrySet().iterator();
-				      while (i.hasNext())
-				      {
-				        Map.Entry e = (Map.Entry)i.next();
-				        if (e.getKey().equals("resources"))
-				        {
-				          jsonresourceobj = (JSONArray)e.getValue();
-				          for (int j = 0; j < jsonresourceobj.size(); j++)
-						  {
-				        	  
-				        	    arraysize=new HashMap<String,Integer>();
-				        	    arrayrunning=new HashMap<String,Integer>();
-				        	    setArrayresponsecount();
-				        	    siqList.createRow();
-						        JSONObject obj1 = jsonresourceobj.getJSONObject(j);
-						        arrayresponse.put(this.getArrayresponsecount(),obj1.toString());
-						        extraction(null,obj1.toString(),false,false);  
-						        siqList.addtoRowList();
-						        
-						  }
-				        }
-				        else
-				        {
-				        	if(e.getKey().toString().equals("total"))
-				        		continue;
-				        	arraysize=new HashMap<String,Integer>();
-			        	    arrayrunning=new HashMap<String,Integer>();
-			        	    setArrayresponsecount();
-				        	siqList.createRow();
-				        	arrayresponse.put(this.getArrayresponsecount(),response.toString());
-				        	extraction(null,response.toString(),false,false);
-				        	siqList.addtoRowList();
-				        	break;
-				        	
-				        	
-				        }
-				      }   
-			      }
+					
+					
+			    }
 				response=null;
+				System.out.println("the siqlist "+siqList.getRows());
 				if(siqList.getRows().size()<500)
 				{
 					limitReached=true;
@@ -315,7 +273,50 @@ public class RESTInterface {
 	public void setRESTlist(RESTList siqList) {
 		this.siqList = siqList;
 	}
+	public void reponsethreading()
+	{
 
+		  JSONObject jb = JSONObject.fromObject(response);
+	      JSONArray jsonresourceobj = null;
+	      Iterator i = jb.entrySet().iterator();
+	      while (i.hasNext())
+	      {
+	        Map.Entry e = (Map.Entry)i.next();
+	        if (e.getKey().equals("resources"))
+	        {
+	          jsonresourceobj = (JSONArray)e.getValue();
+	          for (int j = 0; j < jsonresourceobj.size(); j++)
+			  {
+	        	  
+	        	    arraysize=new HashMap<String,Integer>();
+	        	    arrayrunning=new HashMap<String,Integer>();
+	        	    setArrayresponsecount();
+	        	    siqList.createRow();
+			        JSONObject obj1 = jsonresourceobj.getJSONObject(j);
+			        arrayresponse.put(this.getArrayresponsecount(),obj1.toString());
+			        extraction(null,obj1.toString(),false,false);  
+			        siqList.addtoRowList();
+			        
+			  }
+	        }
+	        else
+	        {
+	        	if(e.getKey().toString().equals("total"))
+	        		continue;
+	        	arraysize=new HashMap<String,Integer>();
+	      	    arrayrunning=new HashMap<String,Integer>();
+	      	    setArrayresponsecount();
+	        	siqList.createRow();
+	        	arrayresponse.put(this.getArrayresponsecount(),response.toString());
+	        	extraction(null,response.toString(),false,false);
+	        	siqList.addtoRowList();
+	        	break;
+	        	
+	        	
+	        }
+	      }   
+    
+	}
 	public boolean extraction(String parent,String JSONString,boolean parentcheck,boolean levelcheck)
 	{	
 	    JSONObject jsonobj = JSONObject.fromObject(JSONString);
@@ -486,6 +487,8 @@ public class RESTInterface {
 	    return pcheck;
 	    
 	}
+	
+	
 	public String checkobjectarray(Object value)
 	{
 		if(value instanceof JSONObject)

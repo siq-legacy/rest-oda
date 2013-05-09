@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
@@ -43,8 +44,17 @@ private RESTParameterMetaData parameterMetaData;
   private RESTConnection connection;
   private HashMap<String,List<String>> versions;
   private RESTList restList;
+  public RESTClient getRc() {
+	return rc;
+}
+
+private  RESTClient rc;
   
-  public HashMap<String, HashMap<String, String>> getResources() {
+  public void setRc(RESTClient rc) {
+	this.rc = rc;
+}
+
+public HashMap<String, HashMap<String, String>> getResources() {
 	return resources;
 }
   
@@ -87,10 +97,12 @@ public RESTQuery(String argdatasettype,RESTConnection connectionarg)
     throws OdaException
   {
     this.logger.finest("EXECUTE QUERY");
+    //till now one instance of accesspattern is supported
+    System.out.println("the execute query");
 	parameterMetaData=new RESTParameterMetaData(this.paramPositions);
 	restInterface.prepare();
 	restInterface.setRESTlist(restList);
-	IResultSet  resultSet= new RESTResultSet(restInterface,resultsetMetaData,datasettype,connection);
+  IResultSet  resultSet= new RESTResultSet(restInterface,resultsetMetaData,datasettype,connection);
     resultSet.setMaxRows(getMaxRows());
     return resultSet;
   }
@@ -143,9 +155,9 @@ public RESTQuery(String argdatasettype,RESTConnection connectionarg)
   public void prepare(String queryText)
     throws OdaException
   {
-	 this.restList=new RESTList();
+	
 	 this.queryText=queryText;
-	 System.out.println("inside prepare "+queryText);
+	 System.out.println("inside prepare"+queryText);
 	 if(columnsextract==null)
 	 {
 		 columnsextract=new RESTColumnsExtract(connection);
@@ -154,10 +166,24 @@ public RESTQuery(String argdatasettype,RESTConnection connectionarg)
 	 {
 		 if(this.queryText.startsWith(RESTConstants.PARAMETER_1))
 		 {
-			 columnsextract.extract(this.queryText,datasettype);
-			 resources=columnsextract.getResources();
-			 versions=columnsextract.getVersions();
-			 columnmapping=columnsextract.getColumnmapping();
+			 if(rc==null)
+			 {
+				 this.restList=new RESTList();
+				 rc=new RESTClient();
+				 columnsextract=new RESTColumnsExtract(connection);
+				 columnsextract.extract(this.queryText,datasettype,rc);
+			 }
+			 else if(rc.getRunning_thread().getState()==Thread.State.TERMINATED) 
+			 {
+				
+				 columnsextract.getResponse(this.queryText,datasettype,rc);
+				 System.out.println("get the resources");
+				 resources=columnsextract.getResources();
+				 versions=columnsextract.getVersions();
+				 columnmapping=columnsextract.getColumnmapping();
+			 }
+			
+			
 		 }
 		 else if(this.queryText.startsWith(RESTConstants.PARAMETER_2))
 		 {
@@ -167,8 +193,9 @@ public RESTQuery(String argdatasettype,RESTConnection connectionarg)
 		 else
 		 {
 			 String[] queryarray=queryText.split(",");
-			 String[] columns_names=queryarray[1].split(";");
-			 String[] columns_datatypes=queryarray[2].split(";");
+			 restInterface.setQuery(queryarray);
+			 String[] columns_names=queryarray[4].split(";");
+			 String[] columns_datatypes=queryarray[5].split(";");
 			 columnsextract.setColumnnames(Arrays.asList(columns_names));
 			 columnsextract.setDatatypes(Arrays.asList(columns_datatypes));
 			 restList.setColumnlist(Arrays.asList(columns_names));
@@ -179,9 +206,11 @@ public RESTQuery(String argdatasettype,RESTConnection connectionarg)
 	 }
 	 else
 	 {
+		 this.restList=new RESTList();
 		 String[] queryarray=queryText.split(",");
-		 String[] columns_names=queryarray[1].split(";");
-		 String[] columns_datatypes=queryarray[2].split(";");
+		 restInterface.setQuery(queryarray);
+		 String[] columns_names=queryarray[4].split(";");
+		 String[] columns_datatypes=queryarray[5].split(";");
 		 columnsextract.setColumnnames(Arrays.asList(columns_names));
 		 columnsextract.setDatatypes(Arrays.asList(columns_datatypes));
 		 restList.setColumnlist(Arrays.asList(columns_names));
@@ -296,6 +325,7 @@ public void setAppContext(Object context)
 	  restInterface.setParameterList(accessPattern.getRequestParameters());
 	  restInterface.setColumnMappingList(accessPattern.getColumnMapping());
 	  restInterface.setQuery((String[])accessPattern.getQuery().toArray(new String[accessPattern.getQuery().size()]));
+			  
   }
 
   public void setObject(int paramPosition, Object paramValue)
@@ -308,6 +338,7 @@ public void setAppContext(Object context)
 	  restInterface.setParameterList(accessPattern.getRequestParameters());
 	  restInterface.setColumnMappingList(accessPattern.getColumnMapping());
 	  restInterface.setQuery((String[])accessPattern.getQuery().toArray(new String[accessPattern.getQuery().size()]));
+	
   }
 
   public void setProperty(String name, String value)

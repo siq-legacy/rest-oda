@@ -85,6 +85,7 @@ public class RESTColumnsExtract implements RESTConstants {
 				}		
 			}
 		}
+		System.out.println("the columnsextrac "+complicatedcolumns);
 	
 		
 	}
@@ -105,7 +106,7 @@ public class RESTColumnsExtract implements RESTConstants {
 		HashMap<String,Object> rawcolumn=rawcolumnmapping.get(resource);
 	
 		JSONObject jb=JSONObject.fromObject(rawcolumn.get(column));
-		System.out.println(resource+" "+column+" "+datatype+" "+jb.toString());
+		
 		if(jb.get(DATATYPE).equals(RESTConstants.COMP_DATA_TYPE1))
 		{
 			Object item=jb.get(SEQUENCE_DATATYPE_PASS1);
@@ -128,10 +129,85 @@ public class RESTColumnsExtract implements RESTConstants {
 	public HashMap<String, List<String>> getVersions() {
 		return versions;
 	}
-	@SuppressWarnings("unchecked")
-	public void extract(String urlarray,String datasettype) throws OdaException  
+	public void getResponse(String urlarray,String datasettype,RESTClient rc)
 	{
-		RESTClient rc=new RESTClient();
+		String api = null;
+		System.out.println("");
+		response=rc.getResponse();
+		System.out.println("");
+		if(datasettype.equals(RESTConstants.ODA_DATA_SET_UI_ID))
+		{
+			 String[] cons=urlarray.split(",");
+			
+			 if(cons[0].equals("API"))
+			 {
+					 api=cons[1];
+			 }
+		
+		 Object VersionObj;
+		 jb = JSONObject.fromObject(response);
+		 VersionObj=jb.get("versions");
+		 jb=JSONObject.fromObject(VersionObj);
+		 System.out.println(jb+"columnsname");
+		 Set<String> Versions = jb.keySet();
+		 List<String> verparam=new LinkedList<String>();
+		 for (final String version : Versions)
+		 {
+			 System.out.println(version+"columnsname");
+			 verparam.add(version);
+			 VersionObj=jb.get(version);
+			 jb=JSONObject.fromObject(VersionObj);
+			 
+			 Set<String> resources=jb.keySet();
+			 JSONObject jbversion=jb;
+			 HashMap<String,String>temp= new HashMap<String,String>();
+		
+			
+			 for (String resource : resources)
+			 {	
+				 System.out.println(resource+"columnsname");
+				 Object resourceobject=jbversion.get(resource);
+				
+				 jb=JSONObject.fromObject(resourceobject);
+				 Object Schema=jb.get(SCHEMA);
+				 jb=JSONObject.fromObject(Schema);
+				 Iterator jbi = jb.entrySet().iterator();
+				 HashMap<String,String>column_data= new HashMap<String,String>();
+				 HashMap<String,Object>raw_column_data= new HashMap<String,Object>();
+				 while (jbi.hasNext())
+			     { 
+			    	Map.Entry e = (Map.Entry)jbi.next();
+			    	Object objvalue=e.getValue();
+				    jb=JSONObject.fromObject(objvalue);
+				    column_data.put((String) e.getKey(), jb.get(DATATYPE).toString());
+				    
+				    if(jb.get(DATATYPE).equals(RESTConstants.COMP_DATA_TYPE1))
+				    {
+				    	  raw_column_data.put((String) e.getKey(), objvalue);
+				    }
+				    else if(jb.get(DATATYPE).equals(RESTConstants.COMP_DATA_TYPE2))
+				    {
+				    	  raw_column_data.put((String) e.getKey(), objvalue);
+				    }    
+			     }
+				 System.out.println(resource+"columnsname"+column_data);
+				 
+				 temp.put(resource, resource);
+				 resources_name.put(api,temp);
+				 columnmapping.put(resource, column_data);
+				 rawcolumnmapping.put(resource, raw_column_data);
+			 }
+			 
+		 }
+		 System.out.println("resource_name"+resources_name);
+		 versions.put(api, verparam);
+		}
+		
+	}
+	@SuppressWarnings("unchecked")
+	public void extract(String urlarray,String datasettype,RESTClient rc) throws OdaException  
+	{
+		
 	  try {
 			if(datasettype.equals(RESTConstants.ODA_DATA_SET_UI_ID))
 			{
@@ -142,102 +218,44 @@ public class RESTColumnsExtract implements RESTConstants {
 						 api=cons[1];
 						 Object VersionObj;
 						 url=connection.getUrl()+api+SPECIFICATION;
-						 
-						if(!apilist.contains(api))
-						{
-							apilist.add(api);
-							
-							 if(connection.getApi().equals(RESTConstants.APPSTACK))
-							 {
-								 url="https://"+connection.getIpAddress()+RESTConstants.LOGIN_URL_APPSTACK;
-								 if(rc.ExecuteHEAD(url,connection.getUsername(),connection.getPassword())==false)
+							if(!apilist.contains(api))
+							{
+								apilist.add(api);
+								
+								 if(connection.getApi().equals(RESTConstants.APPSTACK))
 								 {
-									
-									 throw new OdaException("Connection to datasource failed ,pls check the datasource again");
-								 }
-								 else
-								 {
-									
-									 if(cons[1].equals(ENAMEL))
+									 url="http://"+connection.getIpAddress()+RESTConstants.LOGIN_URL_APPSTACK;
+									 if(rc.ExecuteHEAD(url,connection.getUsername(),connection.getPassword())==false)
 									 {
-										 url="https://"+connection.getIpAddress()+connection.APPSTACK_ENAMEL_SPECIFICATION;
+										
+										 throw new OdaException("Connection to datasource failed ,pls check the datasource again");
 									 }
-								 }
-								
-							 }
-							 else  if(connection.getApi().equals(RESTConstants.GATEWAY))
-							 {	
-									 url=connection.getUrl()+api+SPECIFICATION;					 
-							 }
-							
-							 response=rc.ExecuteGet(null, url);
-							 jb = JSONObject.fromObject(response);
-							 System.out.println("the response "+response);
-							 VersionObj=jb.get("versions");
-							 jb=JSONObject.fromObject(VersionObj);
-							
-							 Set<String> Versions = jb.keySet();
-							 List<String> verparam=new LinkedList<String>();
-							 for (final String version : Versions)
-							 {
-								
-								 verparam.add(version);
-								 VersionObj=jb.get(version);
-								 jb=JSONObject.fromObject(VersionObj);
-								 
-								 Set<String> resources=jb.keySet();
-								 JSONObject jbversion=jb;
-								 HashMap<String,String>temp= new HashMap<String,String>();
-							
-								
-								 for (String resource : resources)
-								 {	
-									 Object resourceobject=jbversion.get(resource);
+									 else
+									 {
+										
+										 if(cons[1].equals(ENAMEL))
+										 {
+											 url="http://"+connection.getIpAddress()+connection.APPSTACK_ENAMEL_SPECIFICATION;
+										 }
+									 }
 									
-									 jb=JSONObject.fromObject(resourceobject);
-									 Object Schema=jb.get(SCHEMA);
-									 jb=JSONObject.fromObject(Schema);
-									 Iterator jbi = jb.entrySet().iterator();
-									 HashMap<String,String>column_data= new HashMap<String,String>();
-									 HashMap<String,Object>raw_column_data= new HashMap<String,Object>();
-									 while (jbi.hasNext())
-								     { 
-								    	Map.Entry e = (Map.Entry)jbi.next();
-								    	Object objvalue=e.getValue();
-									    jb=JSONObject.fromObject(objvalue);
-									    column_data.put((String) e.getKey(), jb.get(DATATYPE).toString());
-									    
-									    if(jb.get(DATATYPE).equals(RESTConstants.COMP_DATA_TYPE1))
-									    {
-									    	  raw_column_data.put((String) e.getKey(), objvalue);
-									    }
-									    else if(jb.get(DATATYPE).equals(RESTConstants.COMP_DATA_TYPE2))
-									    {
-									    	  raw_column_data.put((String) e.getKey(), objvalue);
-									    }    
-								     }
-									 System.out.println(resource+"columnsname"+column_data);
-									 
-									 temp.put(resource, resource);
-									 resources_name.put(api,temp);
-									 columnmapping.put(resource, column_data);
-									 rawcolumnmapping.put(resource, raw_column_data);
 								 }
-								 
-							 }
-							 System.out.println("resource_name"+resources_name);
-							 versions.put(api, verparam);
+								 else  if(connection.getApi().equals(RESTConstants.GATEWAY))
+								 {	
+										 url=connection.getUrl()+api+SPECIFICATION;					 
+								 }
+								
+								 rc.ExecuteGet(null, url,datasettype);
+						}
+								
 					}
 				 }
-				
-				
-			}		
 	  }
 		catch (Exception e)
 		{
 			// TODO Auto-generated catch block
-		e.printStackTrace();
-		throw new OdaException("Error in extracting column names");
+			e.printStackTrace();
+			throw new OdaException("Error in extracting column names");
 		}
 	}
 	
