@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.apache.commons.json.JSONException;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
@@ -162,7 +164,12 @@ public RESTQuery(String argdatasettype,RESTConnection connectionarg)
 		 else if(this.queryText.startsWith(RESTConstants.PARAMETER_2))
 		 {
 			 String[] array=this.queryText.split(",");
-			 complicatedcolumnmapping=columnsextract.getComplicatedColumnmapping(array[1], array[2], array[3]);
+			 try {
+				complicatedcolumnmapping=columnsextract.getComplicatedColumnmapping(array[1], array[2], array[3]);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				throw new OdaException("Exception occured during JSON Object Processing");
+			}
 		 }
 		 else
 		 {

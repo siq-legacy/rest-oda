@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.json.JSONObject;
+import org.apache.commons.json.JSON;
+import org.apache.commons.json.JSONException;
+import org.apache.commons.json.JSONObject;
 
 import org.eclipse.datatools.connectivity.oda.OdaException;
 
@@ -98,28 +100,57 @@ public class RESTColumnsExtract implements RESTConstants {
 		return columnmapping;
 	}
 	
-	public HashMap<String, String> getComplicatedColumnmapping(String resource,String column,String datatype) 
+	public HashMap<String, String> getComplicatedColumnmapping(String resource,String column,String datatype) throws JSONException 
 	{
 	
 		
 		HashMap<String,Object> rawcolumn=rawcolumnmapping.get(resource);
-	
-		JSONObject jb=JSONObject.fromObject(rawcolumn.get(column));
+		 JSONObject jb;  
+		 try
+		 {
+			 jb = (JSONObject)JSON.parse(rawcolumn.get(column).toString());
+		 }
+		 catch(Exception ex)
+		 {
+			throw new JSONException("String Object is Null");
+		 }
 		System.out.println(resource+" "+column+" "+datatype+" "+jb.toString());
 		if(jb.get(DATATYPE).equals(RESTConstants.COMP_DATA_TYPE1))
 		{
 			Object item=jb.get(SEQUENCE_DATATYPE_PASS1);
-			jb=JSONObject.fromObject(item);
+			 try
+			 {
+				 jb = (JSONObject)JSON.parse(item.toString());
+			 }
+			 catch(Exception ex)
+			 {
+				throw new JSONException("String Object is Null");
+			 }
 			Object structure=jb.get(SEQUENCE_DATATYPE_PASS2);
-			jb=JSONObject.fromObject(structure);
+			 try
+			 {
+				 jb = (JSONObject)JSON.parse(structure.toString());
+			 }
+			 catch(Exception ex)
+			 {
+				throw new JSONException("String Object is Null");
+			 }
 			Iterator jbi = jb.entrySet().iterator();
 			while (jbi.hasNext())
 		    { 
 		    	Map.Entry e = (Map.Entry)jbi.next();
 		    	System.out.println("the line "+e.getValue());
 		    	Object objvalue=e.getValue();
-			    jb=JSONObject.fromObject(objvalue);
-			    complicatedcolumnmapping.put((String) e.getKey(), jb.get(DATATYPE).toString());
+		    	 try
+				 {
+					 jb = (JSONObject)JSON.parse(objvalue.toString());
+				 }
+				 catch(Exception ex)
+				 {
+					throw new JSONException("String Object is Null");
+				 }
+
+			     complicatedcolumnmapping.put((String) e.getKey(), jb.get(DATATYPE).toString());
 		    }
 		}
 		
@@ -171,10 +202,24 @@ public class RESTColumnsExtract implements RESTConstants {
 							 }
 							
 							 response=rc.ExecuteGet(null, url);
-							 jb = JSONObject.fromObject(response);
+								try
+								{
+									jb = (JSONObject)JSON.parse(response);
+								}
+								catch(Exception ex)
+								{
+									throw new JSONException("String Object is Null");
+								}
 							 System.out.println("the response "+response);
 							 VersionObj=jb.get("versions");
-							 jb=JSONObject.fromObject(VersionObj);
+							 try
+								{
+									jb = (JSONObject)JSON.parse(VersionObj.toString());
+								}
+								catch(Exception ex)
+								{
+									throw new JSONException("String Object is Null");
+								}
 							
 							 Set<String> Versions = jb.keySet();
 							 List<String> verparam=new LinkedList<String>();
@@ -183,7 +228,14 @@ public class RESTColumnsExtract implements RESTConstants {
 								
 								 verparam.add(version);
 								 VersionObj=jb.get(version);
-								 jb=JSONObject.fromObject(VersionObj);
+								 try
+									{
+										jb = (JSONObject)JSON.parse(VersionObj.toString());
+									}
+									catch(Exception ex)
+									{
+										throw new JSONException("String Object is Null");
+									}
 								 
 								 Set<String> resources=jb.keySet();
 								 JSONObject jbversion=jb;
@@ -193,10 +245,23 @@ public class RESTColumnsExtract implements RESTConstants {
 								 for (String resource : resources)
 								 {	
 									 Object resourceobject=jbversion.get(resource);
-									
-									 jb=JSONObject.fromObject(resourceobject);
+									 try
+										{
+											jb = (JSONObject)JSON.parse(resourceobject.toString());
+										}
+										catch(Exception ex)
+										{
+											throw new JSONException("String Object is Null");
+										}
 									 Object Schema=jb.get(SCHEMA);
-									 jb=JSONObject.fromObject(Schema);
+									 try
+										{
+											jb = (JSONObject)JSON.parse(Schema.toString());
+										}
+										catch(Exception ex)
+										{
+											throw new JSONException("String Object is Null");
+										}
 									 Iterator jbi = jb.entrySet().iterator();
 									 HashMap<String,String>column_data= new HashMap<String,String>();
 									 HashMap<String,Object>raw_column_data= new HashMap<String,Object>();
@@ -204,7 +269,14 @@ public class RESTColumnsExtract implements RESTConstants {
 								     { 
 								    	Map.Entry e = (Map.Entry)jbi.next();
 								    	Object objvalue=e.getValue();
-									    jb=JSONObject.fromObject(objvalue);
+									    try
+										{
+											jb = (JSONObject)JSON.parse(objvalue.toString());
+										}
+										catch(Exception ex)
+										{
+											throw new JSONException("String Object is Null");
+										}
 									    column_data.put((String) e.getKey(), jb.get(DATATYPE).toString());
 									    
 									    if(jb.get(DATATYPE).equals(RESTConstants.COMP_DATA_TYPE1))

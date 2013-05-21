@@ -29,7 +29,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-install-plugin</artifactId>
-         
         <executions>
           <execution>
             <phase>install</phase>
@@ -39,7 +38,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
-       
         <executions>
           <execution>
             <phase>deploy</phase>
@@ -72,11 +70,6 @@
 </dependency>
 <dependency>
   <groupId>org.apache.commons</groupId>
-  <artifactId>httpclient</artifactId>
-  <version>3.1</version>
-</dependency>
-<dependency>
-  <groupId>org.apache.commons</groupId>
   <artifactId>lang</artifactId>
   <version>2.3</version>
 </dependency>
@@ -99,12 +92,6 @@
   <groupId>net.sf</groupId>
   <artifactId>ezmorph</artifactId>
   <version>1.0</version>
-</dependency>
-<dependency>
-  <groupId>net.sf</groupId>
-  <artifactId>json</artifactId>
-  <version>2.1</version>
- 
 </dependency>
 <dependency>
   <groupId>org.eclipse</groupId>
@@ -146,6 +133,10 @@
   <artifactId>icu</artifactId>
   <version>1.0</version>
 </dependency>
-
+<dependency>
+  <groupId>org.apache.commons.json</groupId>
+  <artifactId>JSON4J_Apache</artifactId>
+  <version>1.0</version>
+</dependency>
   </dependencies>
 </project>

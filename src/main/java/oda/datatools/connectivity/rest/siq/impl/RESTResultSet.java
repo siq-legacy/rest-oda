@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.json.JSONException;
 import org.eclipse.datatools.connectivity.oda.IBlob;
 import org.eclipse.datatools.connectivity.oda.IClob;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
@@ -305,7 +306,11 @@ public class RESTResultSet
   public void setQuery() throws OdaException
   {
 		
-	    this.rows = this.searchRequest.executeQuery(connection).getRows();
+	    try {
+			this.rows = this.searchRequest.executeQuery(connection).getRows();
+		} catch (JSONException e) {
+			throw new OdaException("JSON Exception Error Occured");
+		}
 	    this.rowIter = this.rows.listIterator();
 	    this.setMaxRows(this.rows.size());
 	 
